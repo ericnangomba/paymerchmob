@@ -10,7 +10,7 @@ export type Txn = {
   type: TxnType;
   status: TxnStatus;
   createdAt: number;
-  token?: string;
+  token?: string | undefined;
 };
 
 export type QrPayload = {
