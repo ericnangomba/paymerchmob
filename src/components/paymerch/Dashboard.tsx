@@ -6,7 +6,7 @@ import { ActionTile, StatusBadge } from "./ui";
 import type { Screen } from "./types";
 
 export function Dashboard({ go }: { go: (s: Screen) => void }) {
-  const { merchantBalance, online, setOnline, txns, pendingCount, syncPending } = usePaymerch();
+  const { merchantBalance, online, setOnline, txns, pendingCount, syncPending, profile } = usePaymerch();
   const [visible, setVisible] = useState(true);
 
   return (
@@ -16,7 +16,12 @@ export function Dashboard({ go }: { go: (s: Screen) => void }) {
           <div className="flex items-center gap-2.5">
             <img src={icon.url} alt="" className="size-9" />
             <div>
-              <p className="text-sm font-semibold text-foreground">My business</p>
+              <p className="text-sm font-semibold text-foreground">{profile?.name ?? "My business"}</p>
+              {profile && (
+                <p className="text-[10px] text-muted-foreground">
+                  {profile.kind === "business" ? profile.businessType : "Individual wallet"}
+                </p>
+              )}
               <button
                 onClick={() => setOnline(!online)}
                 className="flex items-center gap-1.5 text-xs text-muted-foreground"
