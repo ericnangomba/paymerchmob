@@ -28,7 +28,7 @@ export function PaymerchApp() {
 }
 
 function Shell({ dark, setDark }: { dark: boolean; setDark: (v: boolean) => void }) {
-  const { online, setOnline } = usePaymerch();
+  const { online, setOnline, profile } = usePaymerch();
   const [showSplash, setShowSplash] = useState(true);
   const [unlocked, setUnlocked] = useState(false);
   const [screen, setScreen] = useState<Screen>("dashboard");
@@ -71,6 +71,8 @@ function Shell({ dark, setDark }: { dark: boolean; setDark: (v: boolean) => void
       <div className="relative h-[720px] overflow-hidden rounded-[2.25rem] border border-border bg-background shadow-panel">
         {showSplash ? (
           <SplashScreen onComplete={finishSplash} />
+        ) : !profile ? (
+          <RegisterScreen onDone={() => {}} />
         ) : !unlocked ? (
           <AuthScreen onUnlock={() => setUnlocked(true)} />
         ) : screen === "dashboard" ? (
