@@ -30,7 +30,8 @@ export function AuthScreen({ onUnlock }: { onUnlock: () => void }) {
     <div className="flex h-full flex-col justify-between px-6 pb-8 pt-12">
       <div className="text-center">
         <img src={logo.url} alt="Paymerch — Simply Secure Payments" className="mx-auto h-24 w-auto object-contain" />
-        <p className="mt-2 text-sm text-muted-foreground">Enter your 4-digit PIN to continue</p>
+        <p className="mt-2 text-sm text-muted-foreground">Your business. Your money. Even offline.</p>
+        <p className="mt-1 text-xs text-muted-foreground">Enter your 4-digit PIN to continue</p>
       </div>
 
       <div className="flex justify-center gap-3">
