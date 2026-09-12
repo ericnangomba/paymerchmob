@@ -29,6 +29,27 @@ const rand = (n: number) =>
 export const formatZar = (v: number) =>
   new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR" }).format(v);
 
+export type AccountKind = "business" | "individual";
+
+export const BUSINESS_TYPES = [
+  "Spaza shop",
+  "Street vendor",
+  "Car wash",
+  "Tshisa nyama / braai",
+  "Street food stall",
+  "Fruit & veg seller",
+  "Other informal trade",
+] as const;
+
+export type BusinessType = (typeof BUSINESS_TYPES)[number];
+
+export type Profile = {
+  kind: AccountKind;
+  name: string;
+  phone: string;
+  businessType?: BusinessType | undefined;
+};
+
 type Store = {
   buyerBalance: number;
   merchantBalance: number;
