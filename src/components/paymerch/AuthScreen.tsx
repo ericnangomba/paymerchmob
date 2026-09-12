@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Fingerprint } from "lucide-react";
-import logo from "@/assets/paymerchlogo.png.asset.json";
 import { Keypad } from "./ui";
 
 const PIN = "1234";
@@ -29,7 +28,8 @@ export function AuthScreen({ onUnlock }: { onUnlock: () => void }) {
   return (
     <div className="flex h-full flex-col justify-between px-6 pb-8 pt-12">
       <div className="text-center">
-        <img src={logo.url} alt="Paymerch — Simply Secure Payments" className="mx-auto h-24 w-auto object-contain" />
+        <img src="/paymerchlogo.png" alt="Paymerch — Simply Secure Payments" className="mx-auto h-48 w-auto object-contain" />
+        <p className="mt-2 text-xs font-bold uppercase tracking-[0.24em] text-muted-foreground">Mobile</p>
         <p className="mt-2 text-sm text-muted-foreground">Your business. Your money. Even offline.</p>
         <p className="mt-1 text-xs text-muted-foreground">Enter your 4-digit PIN to continue</p>
       </div>

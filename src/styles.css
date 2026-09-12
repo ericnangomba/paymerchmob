@@ -77,25 +77,25 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.145 0 0);
+  --primary: oklch(0.34 0.16 232);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.968 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.968 0 0);
   --muted-foreground: oklch(0.55 0 0);
-  --accent: oklch(0.96 0 0);
+  --accent: oklch(0.76 0.12 186);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(0.923 0 0);
   --input: oklch(0.923 0 0);
-  --ring: oklch(0.6 0.07 210);
-  --success: oklch(0.7 0.15 162);
-  --success-foreground: oklch(0.16 0.03 162);
-  --warning: oklch(0.78 0.16 74);
-  --warning-foreground: oklch(0.22 0.05 74);
-  --brand: oklch(0.68 0.09 195);
-  --brand-deep: oklch(0.45 0.1 235);
+  --ring: oklch(0.6 0.05 232);
+  --success: oklch(0.76 0.12 186);
+  --success-foreground: oklch(0.16 0.03 186);
+  --warning: oklch(0.78 0.17 38);
+  --warning-foreground: oklch(0.22 0.05 38);
+  --brand: oklch(0.68 0.10 186);
+  --brand-deep: oklch(0.34 0.16 232);
   --chart-1: oklch(0.68 0.09 195);
   --chart-2: oklch(0.45 0.1 235);
   --chart-3: oklch(0.7 0.15 162);
@@ -118,25 +118,25 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.16 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.11 0 0);
+  --primary: oklch(0.34 0.16 232);
+  --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.22 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.22 0 0);
   --muted-foreground: oklch(0.7 0 0);
-  --accent: oklch(0.24 0 0);
+  --accent: oklch(0.76 0.12 186);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.68 0.19 22);
   --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.6 0.07 210);
-  --success: oklch(0.72 0.15 162);
-  --success-foreground: oklch(0.14 0.03 162);
-  --warning: oklch(0.8 0.16 74);
-  --warning-foreground: oklch(0.2 0.05 74);
-  --brand: oklch(0.72 0.1 195);
-  --brand-deep: oklch(0.55 0.11 235);
+  --ring: oklch(0.6 0.05 232);
+  --success: oklch(0.76 0.12 186);
+  --success-foreground: oklch(0.14 0.03 186);
+  --warning: oklch(0.78 0.17 38);
+  --warning-foreground: oklch(0.20 0.05 38);
+  --brand: oklch(0.68 0.10 186);
+  --brand-deep: oklch(0.34 0.16 232);
   --sidebar: oklch(0.16 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.985 0 0);
@@ -155,5 +155,89 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+  }
+}
+
+@layer components {
+  .splash-screen {
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 35%, color-mix(in oklch, var(--brand) 22%, transparent), transparent 22%),
+      radial-gradient(circle at 50% 75%, color-mix(in oklch, var(--accent) 16%, transparent), transparent 24%),
+      var(--background);
+  }
+
+  .splash-logo-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: splash-logo-rise 780ms cubic-bezier(.2,.8,.2,1) both;
+  }
+
+  .splash-logo {
+    filter: drop-shadow(0 14px 28px color-mix(in oklch, var(--brand-deep) 25%, transparent));
+    opacity: 0;
+    animation: splash-logo-fade 680ms ease-out 160ms forwards;
+  }
+
+  .splash-mobile {
+    animation: splash-copy-rise 700ms ease-out 200ms both;
+  }
+
+  .splash-tagline {
+    animation: splash-copy-rise 760ms ease-out 340ms both;
+  }
+
+  .splash-description {
+    animation: splash-copy-rise 780ms ease-out 420ms both;
+  }
+
+  .splash-status {
+    animation: splash-status-rise 900ms ease-out 640ms both;
+  }
+}
+
+@keyframes splash-logo-rise {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes splash-logo-fade {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes splash-copy-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes splash-status-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
