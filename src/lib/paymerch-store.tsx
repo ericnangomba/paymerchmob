@@ -51,6 +51,8 @@ export type Profile = {
 };
 
 type Store = {
+  profile: Profile | null;
+  register: (p: Profile) => void;
   buyerBalance: number;
   merchantBalance: number;
   online: boolean;
