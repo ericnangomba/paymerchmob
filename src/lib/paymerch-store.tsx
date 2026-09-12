@@ -181,7 +181,7 @@ export function PaymerchProvider({ children }: { children: ReactNode }) {
       cashOut,
       syncPending,
     }),
-    [buyerBalance, merchantBalance, online, txns, activeQr, generateQr, settleQr, sellVas, cashOut, syncPending],
+    [profile, register, buyerBalance, merchantBalance, online, txns, activeQr, generateQr, settleQr, sellVas, cashOut, syncPending],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

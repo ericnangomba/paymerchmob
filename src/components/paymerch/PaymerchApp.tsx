@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { Wifi, WifiOff, Moon, Sun, Lock } from "lucide-react";
 import { PaymerchProvider, usePaymerch } from "@/lib/paymerch-store";
 import { AuthScreen } from "./AuthScreen";
+import { RegisterScreen } from "./RegisterScreen";
 import { Dashboard } from "./Dashboard";
 import { PayMode } from "./PayMode";
 import { Scanner } from "./Scanner";
