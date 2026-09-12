@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Wifi, WifiOff, Moon, Sun, Lock } from "lucide-react";
 import { PaymerchProvider, usePaymerch } from "@/lib/paymerch-store";
 import { AuthScreen } from "./AuthScreen";
@@ -7,6 +7,7 @@ import { PayMode } from "./PayMode";
 import { Scanner } from "./Scanner";
 import { VasScreen } from "./VasScreen";
 import { CashOut } from "./CashOut";
+import { SplashScreen } from "./SplashScreen";
 import type { Screen } from "./types";
 
 export function PaymerchApp() {
@@ -27,8 +28,10 @@ export function PaymerchApp() {
 
 function Shell({ dark, setDark }: { dark: boolean; setDark: (v: boolean) => void }) {
   const { online, setOnline } = usePaymerch();
+  const [showSplash, setShowSplash] = useState(true);
   const [unlocked, setUnlocked] = useState(false);
   const [screen, setScreen] = useState<Screen>("dashboard");
+  const finishSplash = useCallback(() => setShowSplash(false), []);
 
   return (
     <>
@@ -65,7 +68,9 @@ function Shell({ dark, setDark }: { dark: boolean; setDark: (v: boolean) => void
       </div>
 
       <div className="relative h-[720px] overflow-hidden rounded-[2.25rem] border border-border bg-background shadow-panel">
-        {!unlocked ? (
+        {showSplash ? (
+          <SplashScreen onComplete={finishSplash} />
+        ) : !unlocked ? (
           <AuthScreen onUnlock={() => setUnlocked(true)} />
         ) : screen === "dashboard" ? (
           <Dashboard go={setScreen} />

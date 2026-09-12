@@ -16,7 +16,7 @@ export function Dashboard({ go }: { go: (s: Screen) => void }) {
           <div className="flex items-center gap-2.5">
             <img src={icon.url} alt="" className="size-9" />
             <div>
-              <p className="text-sm font-semibold text-foreground">Thandi's Spaza</p>
+              <p className="text-sm font-semibold text-foreground">My business</p>
               <button
                 onClick={() => setOnline(!online)}
                 className="flex items-center gap-1.5 text-xs text-muted-foreground"
