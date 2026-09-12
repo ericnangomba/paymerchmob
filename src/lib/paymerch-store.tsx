@@ -71,6 +71,8 @@ type Store = {
 const Ctx = createContext<Store | null>(null);
 
 export function PaymerchProvider({ children }: { children: ReactNode }) {
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const register = useCallback((p: Profile) => setProfile(p), []);
   const [buyerBalance, setBuyerBalance] = useState(1250);
   const [merchantBalance, setMerchantBalance] = useState(4820.5);
   const [online, setOnline] = useState(true);
@@ -163,6 +165,8 @@ export function PaymerchProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<Store>(
     () => ({
+      profile,
+      register,
       buyerBalance,
       merchantBalance,
       online,
