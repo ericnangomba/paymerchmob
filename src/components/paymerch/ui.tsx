@@ -88,7 +88,7 @@ export function ScreenHeader({ title, onBack }: { title: string; onBack: () => v
       >
         <span aria-hidden="true" className="text-lg leading-none">←</span>
       </button>
-      <img src="/jertine-tech-logo.svg" alt="Jertine Tech Paymerch" className="size-8 rounded-xl object-contain" />
+      <img src="/paymerchlogo.png" alt="Paymerch" className="size-8 rounded-xl object-contain" />
       <h2 className="text-base font-semibold text-foreground">{title}</h2>
     </div>
   );

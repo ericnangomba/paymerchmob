@@ -54,11 +54,11 @@ export function RegisterScreen({ onDone }: { onDone: () => void }) {
   return (
     <div className="flex h-full flex-col overflow-y-auto px-6 pb-8 pt-10">
       <div className="text-center">
-        <img src="/paymerchlogo.png" alt="Paymerch — Simply Secure Payments" className="mx-auto h-32 w-auto object-contain" />
+        <img src="/paymerchlogo.png" alt="Paymerch" className="mx-auto h-40 w-auto object-contain" />
         <p className="mt-2 text-xs font-bold uppercase tracking-[0.24em] text-muted-foreground">Mobile</p>
         <h1 className="mt-4 text-xl font-bold text-foreground">Create your account</h1>
         <p className="mt-1 text-xs leading-5 text-muted-foreground">
-          No bank account needed. Register as an individual or any informal business.
+          Confirm your bank account to fund your wallet, cash out, and move money between your bank and wallet.
         </p>
       </div>
 

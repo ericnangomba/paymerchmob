@@ -27,7 +27,7 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
       <div className="splash-logo-wrap">
         <img
           src="/paymerchlogo.png"
-          alt="Paymerch — Simply Secure Payments"
+          alt="Paymerch"
           className="splash-logo h-56 w-auto object-contain"
         />
       </div>
@@ -36,8 +36,18 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
         Simple payments for every informal trader
       </p>
       <p className="splash-description mt-2 max-w-xs text-xs leading-5 text-muted-foreground">
-        Built for spaza shops, street vendors, car washes, food stalls, tshisa nyama and fresh produce sellers.
+        Built for spaza shops, street vendors, car washes, taxi drivers, food stalls, tshisa nyama and fresh produce sellers.
       </p>
+      <button
+        type="button"
+        onClick={(event) => {
+          event.stopPropagation();
+          onComplete();
+        }}
+        className="splash-status mt-6 inline-flex items-center justify-center rounded-2xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-transform hover:scale-[1.02]"
+      >
+        Get Started
+      </button>
       <div className="splash-status absolute bottom-10 flex items-center gap-2 text-xs font-medium text-muted-foreground">
         <span className="size-2 rounded-full bg-success motion-safe:animate-pulse" />
         Works online and offline

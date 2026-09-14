@@ -13,7 +13,7 @@ export function Dashboard({ go }: { go: (s: Screen) => void }) {
       <header className="border-b border-border px-5 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <img src="/jertine-tech-logo.svg" alt="Jertine Tech Paymerch" className="size-9 rounded-xl object-contain" />
+            <img src="/paymerchlogo.png" alt="Paymerch" className="size-9 rounded-xl object-contain" />
             <div>
               <p className="text-sm font-semibold text-foreground">{profile?.name ?? "My business"}</p>
               {profile && (
