@@ -7,6 +7,7 @@ import { PayMode } from "./PayMode";
 import { Scanner } from "./Scanner";
 import { VasScreen } from "./VasScreen";
 import { CashOut } from "./CashOut";
+import { BankTopUp } from "./BankTopUp";
 import { SplashScreen } from "./SplashScreen";
 import type { Screen } from "./types";
 
@@ -46,8 +47,10 @@ function Shell() {
           <PayMode onBack={() => setScreen("dashboard")} />
         ) : screen === "vas" ? (
           <VasScreen onBack={() => setScreen("dashboard")} />
-        ) : (
+        ) : screen === "cashout" ? (
           <CashOut onBack={() => setScreen("dashboard")} />
+        ) : (
+          <BankTopUp onBack={() => setScreen("dashboard")} />
         )}
       </div>
 

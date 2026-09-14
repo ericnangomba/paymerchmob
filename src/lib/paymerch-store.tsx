@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 
-export type TxnType = "MERCHANT_PAY" | "VAS_ELEC" | "VAS_AIRTIME" | "TOPUP" | "CASHOUT";
+export type TxnType = "MERCHANT_PAY" | "VAS_ELEC" | "VAS_AIRTIME" | "TOPUP" | "CASHOUT" | "BANK_DEPOSIT";
 export type TxnStatus = "SUCCESS" | "PENDING" | "FAILED";
 
 export type Txn = {
@@ -35,6 +35,7 @@ export const BUSINESS_TYPES = [
   "Spaza shop",
   "Street vendor",
   "Car wash",
+  "Taxi driver",
   "Tshisa nyama / braai",
   "Street food stall",
   "Fruit & veg seller",
@@ -43,11 +44,29 @@ export const BUSINESS_TYPES = [
 
 export type BusinessType = (typeof BUSINESS_TYPES)[number];
 
+export type BankAccount = {
+  bankName: string;
+  accountHolder: string;
+  accountNumber: string;
+  branchCode: string;
+  accountType: "Savings" | "Cheque" | "Wallet" | "Business";
+  isConfirmed: boolean;
+};
+
 export type Profile = {
   kind: AccountKind;
   name: string;
   phone: string;
   businessType?: BusinessType | undefined;
+  bankAccount?: BankAccount | undefined;
+};
+
+export const PAYMERCH_BANK_ACCOUNT = {
+  bankName: "Paymerch Commercial Bank",
+  accountName: "Paymerch Wallet Settlement",
+  accountNumber: "PMW-000240",
+  branchCode: "001",
+  accountType: "Wallet" as const,
 };
 
 type Store = {
@@ -65,6 +84,7 @@ type Store = {
   settleQr: (payload: QrPayload) => { ok: boolean; reason?: string; txn?: Txn };
   sellVas: (kind: "VAS_ELEC" | "VAS_AIRTIME", target: string, amount: number) => Txn;
   cashOut: (amount: number) => { ok: boolean; reason?: string };
+  bankToWallet: (amount: number) => { ok: boolean; reason?: string };
   syncPending: () => number;
 };
 
@@ -141,13 +161,30 @@ export function PaymerchProvider({ children }: { children: ReactNode }) {
 
   const cashOut = useCallback(
     (amount: number) => {
+      if (!profile?.bankAccount?.isConfirmed) {
+        return { ok: false, reason: "Confirm your bank account before cashing out" };
+      }
       if (!online) return { ok: false, reason: "Cash out needs a live connection" };
       if (amount > merchantBalance) return { ok: false, reason: "Amount exceeds wallet balance" };
       setMerchantBalance((m) => m - amount);
-      push({ id: rand(8), label: "Cash out · Bank transfer", amount, type: "CASHOUT", status: "SUCCESS", createdAt: Date.now() });
+      push({ id: rand(8), label: `Cash out · ${profile.bankAccount?.bankName ?? "Bank transfer"}`, amount, type: "CASHOUT", status: "SUCCESS", createdAt: Date.now() });
       return { ok: true };
     },
-    [merchantBalance, online, push],
+    [merchantBalance, online, profile, push],
+  );
+
+  const bankToWallet = useCallback(
+    (amount: number) => {
+      if (!profile?.bankAccount?.isConfirmed) {
+        return { ok: false, reason: "Confirm your bank account before loading the wallet" };
+      }
+      if (!online) return { ok: false, reason: "Bank transfer needs a live connection" };
+      if (amount <= 0) return { ok: false, reason: "Enter a valid bank transfer amount" };
+      setMerchantBalance((m) => m + amount);
+      push({ id: rand(8), label: `Bank deposit · ${profile.bankAccount?.bankName ?? "Paymerch bank"}`, amount, type: "BANK_DEPOSIT", status: "SUCCESS", createdAt: Date.now() });
+      return { ok: true };
+    },
+    [online, profile, push],
   );
 
   const syncPending = useCallback(() => {
@@ -179,9 +216,10 @@ export function PaymerchProvider({ children }: { children: ReactNode }) {
       settleQr,
       sellVas,
       cashOut,
+      bankToWallet,
       syncPending,
     }),
-    [profile, register, buyerBalance, merchantBalance, online, txns, activeQr, generateQr, settleQr, sellVas, cashOut, syncPending],
+    [profile, register, buyerBalance, merchantBalance, online, txns, activeQr, generateQr, settleQr, sellVas, cashOut, bankToWallet, syncPending],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

@@ -84,10 +84,11 @@ export function ScreenHeader({ title, onBack }: { title: string; onBack: () => v
       <button
         onClick={onBack}
         className="flex size-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-accent"
-        aria-label="Go back"
+        aria-label="Go back home"
       >
-        ←
+        <span aria-hidden="true" className="text-lg leading-none">←</span>
       </button>
+      <img src="/jertine-tech-logo.svg" alt="Jertine Tech Paymerch" className="size-8 rounded-xl object-contain" />
       <h2 className="text-base font-semibold text-foreground">{title}</h2>
     </div>
   );

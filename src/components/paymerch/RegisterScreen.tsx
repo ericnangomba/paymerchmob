@@ -1,6 +1,15 @@
 import { useState } from "react";
-import { Store, User, Check } from "lucide-react";
-import { BUSINESS_TYPES, usePaymerch, type AccountKind, type BusinessType } from "@/lib/paymerch-store";
+import { Store, User, Check, Landmark, ShieldCheck } from "lucide-react";
+import { BUSINESS_TYPES, usePaymerch, type AccountKind, type BusinessType, type BankAccount } from "@/lib/paymerch-store";
+
+const defaultBankAccount = {
+  bankName: "FNB",
+  accountHolder: "",
+  accountNumber: "",
+  branchCode: "",
+  accountType: "Savings" as const,
+  isConfirmed: false,
+};
 
 export function RegisterScreen({ onDone }: { onDone: () => void }) {
   const { register } = usePaymerch();
@@ -8,8 +17,20 @@ export function RegisterScreen({ onDone }: { onDone: () => void }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [businessType, setBusinessType] = useState<BusinessType>(BUSINESS_TYPES[0]);
+  const [bankName, setBankName] = useState(defaultBankAccount.bankName);
+  const [accountHolder, setAccountHolder] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [branchCode, setBranchCode] = useState("");
+  const [accountType, setAccountType] = useState<BankAccount["accountType"]>("Savings");
+  const [bankConfirmed, setBankConfirmed] = useState(false);
 
-  const canSubmit = name.trim().length > 1 && phone.trim().length >= 9;
+  const canSubmit =
+    name.trim().length > 1 &&
+    phone.trim().length >= 9 &&
+    accountHolder.trim().length >= 2 &&
+    accountNumber.trim().length >= 5 &&
+    branchCode.trim().length >= 3 &&
+    bankConfirmed;
 
   const submit = () => {
     if (!canSubmit) return;
@@ -18,6 +39,14 @@ export function RegisterScreen({ onDone }: { onDone: () => void }) {
       name: name.trim(),
       phone: phone.trim(),
       businessType: kind === "business" ? businessType : undefined,
+      bankAccount: {
+        bankName,
+        accountHolder: accountHolder.trim(),
+        accountNumber: accountNumber.trim(),
+        branchCode: branchCode.trim(),
+        accountType,
+        isConfirmed: true,
+      },
     });
     onDone();
   };
@@ -98,6 +127,48 @@ export function RegisterScreen({ onDone }: { onDone: () => void }) {
             </div>
           </div>
         )}
+
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <div className="flex items-center gap-2">
+            <Landmark className="size-4 text-primary" />
+            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Bank account</span>
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <label className="block">
+              <span className="text-[11px] font-semibold text-muted-foreground">Bank</span>
+              <input value={bankName} onChange={(e) => setBankName(e.target.value)} className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground" />
+            </label>
+            <label className="block">
+              <span className="text-[11px] font-semibold text-muted-foreground">Account type</span>
+              <select value={accountType} onChange={(e) => setAccountType(e.target.value as BankAccount["accountType"])} className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground">
+                <option>Savings</option>
+                <option>Cheque</option>
+                <option>Wallet</option>
+                <option>Business</option>
+              </select>
+            </label>
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <label className="block">
+              <span className="text-[11px] font-semibold text-muted-foreground">Account holder</span>
+              <input value={accountHolder} onChange={(e) => setAccountHolder(e.target.value)} className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground" />
+            </label>
+            <label className="block">
+              <span className="text-[11px] font-semibold text-muted-foreground">Account number</span>
+              <input value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} inputMode="numeric" className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground" />
+            </label>
+          </div>
+          <div className="mt-3">
+            <label className="block">
+              <span className="text-[11px] font-semibold text-muted-foreground">Branch code</span>
+              <input value={branchCode} onChange={(e) => setBranchCode(e.target.value)} inputMode="numeric" className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground" />
+            </label>
+          </div>
+          <label className="mt-3 flex items-center gap-2 rounded-xl border border-success/50 bg-success/10 px-3 py-2 text-[11px] font-semibold text-foreground">
+            <input type="checkbox" checked={bankConfirmed} onChange={(e) => setBankConfirmed(e.target.checked)} className="size-4" />
+            <ShieldCheck className="size-4 text-success" /> Confirm account details for cash out and bank deposit
+          </label>
+        </div>
       </div>
 
       <button
@@ -108,8 +179,7 @@ export function RegisterScreen({ onDone }: { onDone: () => void }) {
         Register & set up PIN
       </button>
       <p className="mt-3 text-center text-[11px] leading-4 text-muted-foreground">
-        Welcoming spaza shops, street vendors, car washes, tshisa nyama, street food stalls and fruit & vegetable
-        sellers.
+        Welcoming spaza shops, street vendors, car washes, taxi drivers, tshisa nyama, street food stalls and fruit & vegetable sellers.
       </p>
     </div>
   );

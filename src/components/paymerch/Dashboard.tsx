@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Eye, EyeOff, QrCode, Zap, Banknote, RefreshCw } from "lucide-react";
-import icon from "@/assets/icon_paymerch.png.asset.json";
+import { Eye, EyeOff, QrCode, Zap, Banknote, RefreshCw, Landmark } from "lucide-react";
 import { formatZar, usePaymerch } from "@/lib/paymerch-store";
 import { ActionTile, StatusBadge } from "./ui";
 import type { Screen } from "./types";
@@ -14,7 +13,7 @@ export function Dashboard({ go }: { go: (s: Screen) => void }) {
       <header className="border-b border-border px-5 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <img src={icon.url} alt="" className="size-9" />
+            <img src="/jertine-tech-logo.svg" alt="Jertine Tech Paymerch" className="size-9 rounded-xl object-contain" />
             <div>
               <p className="text-sm font-semibold text-foreground">{profile?.name ?? "My business"}</p>
               {profile && (
@@ -70,6 +69,12 @@ export function Dashboard({ go }: { go: (s: Screen) => void }) {
             title="Sell VAS"
             subtitle="Airtime & prepaid electricity"
             onClick={() => go("vas")}
+          />
+          <ActionTile
+            icon={<Landmark className="size-4" />}
+            title="Bank to wallet"
+            subtitle="Move confirmed bank funds into your wallet"
+            onClick={() => go("bankTopUp")}
           />
           <ActionTile
             icon={<Banknote className="size-4" />}

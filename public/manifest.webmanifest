@@ -1,0 +1,14 @@
+{
+  "name": "Paymerch Mobile",
+  "short_name": "Paymerch",
+  "description": "Paymerch wallet, merchant cash-out, digital payments and bank wallet top-ups.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#132a8c",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/paymerchlogo.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/favicon.png", "sizes": "192x192", "type": "image/png", "purpose": "any" }
+  ]
+}

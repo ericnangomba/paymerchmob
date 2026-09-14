@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="128" viewBox="0 0 512 128">
+  <rect width="512" height="128" rx="12" fill="#ffffff"/>
+  <g transform="translate(10 10)">
+    <rect x="0" y="0" width="108" height="108" rx="22" fill="#132a8c"/>
+    <path d="M26 79 L54 27 L82 79" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M33 61 H75" fill="none" stroke="#9ce9ff" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <text x="138" y="58" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="34" font-weight="700" fill="#132a8c">Jertine Tech</text>
+  <text x="140" y="88" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="16" font-weight="500" fill="#44546c" letter-spacing="2">PAYMERCH</text>
+</svg>

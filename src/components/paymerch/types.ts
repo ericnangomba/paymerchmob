@@ -1,1 +1,1 @@
-export type Screen = "dashboard" | "scanner" | "pay" | "vas" | "cashout";
+export type Screen = "dashboard" | "scanner" | "pay" | "vas" | "cashout" | "bankTopUp";

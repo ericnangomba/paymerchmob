@@ -3,7 +3,7 @@ import { formatZar, usePaymerch } from "@/lib/paymerch-store";
 import { Keypad, ScreenHeader } from "./ui";
 
 export function CashOut({ onBack }: { onBack: () => void }) {
-  const { merchantBalance, cashOut } = usePaymerch();
+  const { merchantBalance, cashOut, profile } = usePaymerch();
   const [raw, setRaw] = useState("");
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const amount = Number(raw || "0") / 100;
@@ -16,6 +16,11 @@ export function CashOut({ onBack }: { onBack: () => void }) {
           <p className="text-xs uppercase tracking-wider text-muted-foreground">Amount to withdraw</p>
           <p className="mt-1 text-4xl font-bold tracking-tight text-foreground">{formatZar(amount)}</p>
           <p className="mt-1 text-xs text-muted-foreground">Available {formatZar(merchantBalance)}</p>
+          <p className="mt-2 text-[11px] font-semibold text-muted-foreground">
+            {profile?.bankAccount?.isConfirmed
+              ? `Cash out to ${profile.bankAccount.bankName} · ${profile.bankAccount.accountNumber}`
+              : "Confirm your bank account before cashing out"}
+          </p>
           {msg && (
             <p className={`mt-3 text-sm font-semibold ${msg.ok ? "text-success" : "text-destructive"}`}>{msg.text}</p>
           )}
@@ -31,7 +36,7 @@ export function CashOut({ onBack }: { onBack: () => void }) {
           disabled={amount <= 0}
           onClick={() => {
             const res = cashOut(amount);
-            setMsg(res.ok ? { ok: true, text: "Transfer sent to your bank" } : { ok: false, text: res.reason! });
+            setMsg(res.ok ? { ok: true, text: `Transfer sent to ${profile?.bankAccount?.bankName ?? "your bank"}` } : { ok: false, text: res.reason! });
             if (res.ok) setRaw("");
           }}
           className="rounded-2xl bg-primary py-4 text-base font-semibold text-primary-foreground disabled:opacity-40"
