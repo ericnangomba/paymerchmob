@@ -1,29 +1,13 @@
-import { useEffect, type KeyboardEvent, type MouseEvent } from "react";
+import type { MouseEvent } from "react";
 
 export function SplashScreen({ onComplete }: { onComplete: () => void }) {
-  useEffect(() => {
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const timer = window.setTimeout(onComplete, prefersReducedMotion ? 800 : 2200);
-    return () => window.clearTimeout(timer);
-  }, [onComplete]);
-
-  const advanceFromTouch = (event: MouseEvent<HTMLElement> | KeyboardEvent<HTMLElement>) => {
+  const advanceFromTouch = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     onComplete();
   };
 
   return (
-    <div
-      className="splash-screen flex h-full flex-col items-center justify-center bg-background px-8 text-center"
-      onClick={advanceFromTouch}
-      onKeyDown={(event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          advanceFromTouch(event);
-        }
-      }}
-      role="button"
-      tabIndex={0}
-    >
+    <div className="splash-screen flex h-full flex-col items-center justify-center bg-background px-8 text-center">
       <div className="splash-logo-wrap">
         <img
           src="/paymerchlogo.png"

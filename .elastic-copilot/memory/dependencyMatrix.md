@@ -1,17 +1,17 @@
 # Dependency Matrix
 
-*Generated: 2026-09-14T12:27:09.584Z*
+*Generated: 2026-09-16T07:58:02.726Z*
 
 ## Summary
 
-- Files analyzed: 73
+- Files analyzed: 80
 - File types: ts, tsx, js
 
 ## File Type Distribution
 
 - 9 ts files
-- 61 tsx files
-- 3 js files
+- 64 tsx files
+- 7 js files
 
 ## Key Dependencies by Type
 
@@ -24,10 +24,10 @@ Top dependencies:
 - ./lib/error-capture
 - ./routes/__root
 - ./routes/index
+- ./routes/preview.$component
 - ./router.tsx
 - ./start.ts
 - clsx
-- tailwind-merge
 
 ### TSX
 
@@ -37,11 +37,11 @@ Top dependencies:
 - ../styles.css?url
 - ../lib/lovable-error-reporting
 - @tanstack/react-router
-- @/components/paymerch/PaymerchApp
-- ./routeTree.gen
-- @radix-ui/react-tooltip
-- @/lib/utils
-- @radix-ui/react-toggle
+- @/lib/paymerch-store
+- @/components/paymerch/AuthScreen
+- @/components/paymerch/RegisterScreen
+- @/components/paymerch/Dashboard
+- @/components/paymerch/PayMode
 
 ### JS
 
