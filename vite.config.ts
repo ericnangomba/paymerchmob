@@ -7,19 +7,21 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
-  build: {
-    outDir: "dist",
-    emptyOutDir: false,
-  },
-  environments: {
-    client: {
-      build: {
-        outDir: "dist",
-      },
+  vite: {
+    build: {
+      outDir: "dist",
+      emptyOutDir: false,
     },
-    server: {
-      build: {
-        outDir: "dist/server",
+    environments: {
+      client: {
+        build: {
+          outDir: "dist",
+        },
+      },
+      server: {
+        build: {
+          outDir: "dist/server",
+        },
       },
     },
   },

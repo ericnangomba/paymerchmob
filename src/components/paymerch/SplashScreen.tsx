@@ -10,17 +10,20 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
     <div className="splash-screen flex h-full flex-col items-center justify-center bg-background px-8 text-center">
       <div className="splash-logo-wrap">
         <img
-          src="/paymerchlogo.png"
+          src="/mlogopaymerch.png"
           alt="Paymerch"
           className="splash-logo h-56 w-auto object-contain"
         />
       </div>
-      <p className="splash-mobile mt-2 text-xs font-bold uppercase tracking-[0.24em] text-muted-foreground">Mobile</p>
+      <p className="splash-mobile mt-2 text-xs font-bold uppercase tracking-[0.24em] text-muted-foreground">
+        Mobile
+      </p>
       <p className="splash-tagline mt-7 max-w-xs text-sm font-semibold leading-6 text-foreground">
         Simple payments for every informal trader
       </p>
       <p className="splash-description mt-2 max-w-xs text-xs leading-5 text-muted-foreground">
-        Built for spaza shops, street vendors, car washes, taxi drivers, food stalls, tshisa nyama and fresh produce sellers.
+        Built for spaza shops, street vendors, car washes, taxi drivers, food stalls, tshisa nyama
+        and fresh produce sellers.
       </p>
       <button
         type="button"

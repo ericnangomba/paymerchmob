@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Store, User, Check, Landmark, ShieldCheck } from "lucide-react";
-import { BUSINESS_TYPES, usePaymerch, type AccountKind, type BusinessType, type BankAccount } from "@/lib/paymerch-store";
+import {
+  BUSINESS_TYPES,
+  usePaymerch,
+  type AccountKind,
+  type BusinessType,
+  type BankAccount,
+} from "@/lib/paymerch-store";
 
 const defaultBankAccount = {
   bankName: "FNB",
@@ -54,11 +60,18 @@ export function RegisterScreen({ onDone }: { onDone: () => void }) {
   return (
     <div className="flex h-full flex-col overflow-y-auto px-6 pb-8 pt-10">
       <div className="text-center">
-        <img src="/paymerchlogo.png" alt="Paymerch" className="mx-auto h-40 w-auto object-contain" />
-        <p className="mt-2 text-xs font-bold uppercase tracking-[0.24em] text-muted-foreground">Mobile</p>
+        <img
+          src="/mlogopaymerch.png"
+          alt="Paymerch"
+          className="mx-auto h-40 w-auto object-contain"
+        />
+        <p className="mt-2 text-xs font-bold uppercase tracking-[0.24em] text-muted-foreground">
+          Mobile
+        </p>
         <h1 className="mt-4 text-xl font-bold text-foreground">Create your account</h1>
         <p className="mt-1 text-xs leading-5 text-muted-foreground">
-          Confirm your bank account to fund your wallet, cash out, and move money between your bank and wallet.
+          Confirm your bank account to fund your wallet, cash out, and move money between your bank
+          and wallet.
         </p>
       </div>
 
@@ -73,10 +86,14 @@ export function RegisterScreen({ onDone }: { onDone: () => void }) {
             key={opt.id}
             onClick={() => setKind(opt.id)}
             className={`rounded-2xl border p-4 text-left transition-colors ${
-              kind === opt.id ? "border-primary bg-primary/10" : "border-border bg-card hover:bg-accent"
+              kind === opt.id
+                ? "border-primary bg-primary/10"
+                : "border-border bg-card hover:bg-accent"
             }`}
           >
-            <opt.icon className={`size-5 ${kind === opt.id ? "text-primary" : "text-muted-foreground"}`} />
+            <opt.icon
+              className={`size-5 ${kind === opt.id ? "text-primary" : "text-muted-foreground"}`}
+            />
             <p className="mt-2 text-sm font-semibold text-foreground">{opt.label}</p>
             <p className="text-[11px] text-muted-foreground">{opt.hint}</p>
           </button>
@@ -131,16 +148,26 @@ export function RegisterScreen({ onDone }: { onDone: () => void }) {
         <div className="rounded-2xl border border-border bg-card p-4">
           <div className="flex items-center gap-2">
             <Landmark className="size-4 text-primary" />
-            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Bank account</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Bank account
+            </span>
           </div>
           <div className="mt-3 grid grid-cols-2 gap-3">
             <label className="block">
               <span className="text-[11px] font-semibold text-muted-foreground">Bank</span>
-              <input value={bankName} onChange={(e) => setBankName(e.target.value)} className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground" />
+              <input
+                value={bankName}
+                onChange={(e) => setBankName(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground"
+              />
             </label>
             <label className="block">
               <span className="text-[11px] font-semibold text-muted-foreground">Account type</span>
-              <select value={accountType} onChange={(e) => setAccountType(e.target.value as BankAccount["accountType"])} className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground">
+              <select
+                value={accountType}
+                onChange={(e) => setAccountType(e.target.value as BankAccount["accountType"])}
+                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground"
+              >
                 <option>Savings</option>
                 <option>Cheque</option>
                 <option>Wallet</option>
@@ -150,23 +177,47 @@ export function RegisterScreen({ onDone }: { onDone: () => void }) {
           </div>
           <div className="mt-3 grid grid-cols-2 gap-3">
             <label className="block">
-              <span className="text-[11px] font-semibold text-muted-foreground">Account holder</span>
-              <input value={accountHolder} onChange={(e) => setAccountHolder(e.target.value)} className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground" />
+              <span className="text-[11px] font-semibold text-muted-foreground">
+                Account holder
+              </span>
+              <input
+                value={accountHolder}
+                onChange={(e) => setAccountHolder(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground"
+              />
             </label>
             <label className="block">
-              <span className="text-[11px] font-semibold text-muted-foreground">Account number</span>
-              <input value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} inputMode="numeric" className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground" />
+              <span className="text-[11px] font-semibold text-muted-foreground">
+                Account number
+              </span>
+              <input
+                value={accountNumber}
+                onChange={(e) => setAccountNumber(e.target.value)}
+                inputMode="numeric"
+                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground"
+              />
             </label>
           </div>
           <div className="mt-3">
             <label className="block">
               <span className="text-[11px] font-semibold text-muted-foreground">Branch code</span>
-              <input value={branchCode} onChange={(e) => setBranchCode(e.target.value)} inputMode="numeric" className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground" />
+              <input
+                value={branchCode}
+                onChange={(e) => setBranchCode(e.target.value)}
+                inputMode="numeric"
+                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground"
+              />
             </label>
           </div>
           <label className="mt-3 flex items-center gap-2 rounded-xl border border-success/50 bg-success/10 px-3 py-2 text-[11px] font-semibold text-foreground">
-            <input type="checkbox" checked={bankConfirmed} onChange={(e) => setBankConfirmed(e.target.checked)} className="size-4" />
-            <ShieldCheck className="size-4 text-success" /> Confirm account details for cash out and bank deposit
+            <input
+              type="checkbox"
+              checked={bankConfirmed}
+              onChange={(e) => setBankConfirmed(e.target.checked)}
+              className="size-4"
+            />
+            <ShieldCheck className="size-4 text-success" /> Confirm account details for cash out and
+            bank deposit
           </label>
         </div>
       </div>
@@ -179,7 +230,8 @@ export function RegisterScreen({ onDone }: { onDone: () => void }) {
         Register & set up PIN
       </button>
       <p className="mt-3 text-center text-[11px] leading-4 text-muted-foreground">
-        Welcoming spaza shops, street vendors, car washes, taxi drivers, tshisa nyama, street food stalls and fruit & vegetable sellers.
+        Welcoming spaza shops, street vendors, car washes, taxi drivers, tshisa nyama, street food
+        stalls and fruit & vegetable sellers.
       </p>
     </div>
   );

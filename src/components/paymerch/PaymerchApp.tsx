@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { PaymerchProvider, usePaymerch } from "@/lib/paymerch-store";
 import { AuthScreen } from "./AuthScreen";
+import { PinSetupScreen } from "./PinSetupScreen";
 import { RegisterScreen } from "./RegisterScreen";
 import { Dashboard } from "./Dashboard";
 import { PayMode } from "./PayMode";
@@ -9,6 +10,7 @@ import { VasScreen } from "./VasScreen";
 import { CashOut } from "./CashOut";
 import { BankTopUp } from "./BankTopUp";
 import { SplashScreen } from "./SplashScreen";
+import { MainButton } from "./ui";
 import type { Screen } from "./types";
 
 export function PaymerchApp() {
@@ -24,11 +26,14 @@ export function PaymerchApp() {
 }
 
 function Shell() {
-  const { profile } = usePaymerch();
+  const { profile, pinSet } = usePaymerch();
   const [showSplash, setShowSplash] = useState(true);
   const [unlocked, setUnlocked] = useState(false);
   const [screen, setScreen] = useState<Screen>("dashboard");
   const finishSplash = useCallback(() => setShowSplash(false), []);
+  const goHome = useCallback(() => setScreen("dashboard"), []);
+
+  const showMainButton = !showSplash && profile && pinSet && unlocked && screen !== "dashboard";
 
   return (
     <>
@@ -37,26 +42,25 @@ function Shell() {
           <SplashScreen onComplete={finishSplash} />
         ) : !profile ? (
           <RegisterScreen onDone={() => {}} />
+        ) : !pinSet ? (
+          <PinSetupScreen onDone={() => {}} goHome={goHome} />
         ) : !unlocked ? (
-          <AuthScreen onUnlock={() => setUnlocked(true)} />
+          <AuthScreen onUnlock={() => setUnlocked(true)} goHome={goHome} />
         ) : screen === "dashboard" ? (
           <Dashboard go={setScreen} />
         ) : screen === "scanner" ? (
-          <Scanner onBack={() => setScreen("dashboard")} />
+          <Scanner onBack={goHome} />
         ) : screen === "pay" ? (
-          <PayMode onBack={() => setScreen("dashboard")} />
+          <PayMode onBack={goHome} onHome={goHome} />
         ) : screen === "vas" ? (
-          <VasScreen onBack={() => setScreen("dashboard")} />
+          <VasScreen onBack={goHome} />
         ) : screen === "cashout" ? (
-          <CashOut onBack={() => setScreen("dashboard")} />
+          <CashOut onBack={goHome} />
         ) : (
-          <BankTopUp onBack={() => setScreen("dashboard")} />
+          <BankTopUp onBack={goHome} />
         )}
+        {showMainButton && <MainButton onClick={goHome} />}
       </div>
-
-      <p className="mt-4 text-center text-xs text-muted-foreground">
-        Demo PIN <span className="font-semibold text-foreground">1234</span> · balances are simulated
-      </p>
     </>
   );
 }

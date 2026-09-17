@@ -13,16 +13,26 @@ export function CashOut({ onBack }: { onBack: () => void }) {
       <ScreenHeader title="Cash out" onBack={onBack} />
       <div className="flex flex-1 flex-col justify-between px-5 py-5">
         <div className="text-center">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Amount to withdraw</p>
-          <p className="mt-1 text-4xl font-bold tracking-tight text-foreground">{formatZar(amount)}</p>
-          <p className="mt-1 text-xs text-muted-foreground">Available {formatZar(merchantBalance)}</p>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">
+            Amount to withdraw
+          </p>
+          <p className="mt-1 text-4xl font-bold tracking-tight text-foreground">
+            {formatZar(amount)}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Available {formatZar(merchantBalance)}
+          </p>
           <p className="mt-2 text-[11px] font-semibold text-muted-foreground">
             {profile?.bankAccount?.isConfirmed
               ? `Cash out to ${profile.bankAccount.bankName} · ${profile.bankAccount.accountNumber}`
               : "Confirm your bank account before cashing out"}
           </p>
           {msg && (
-            <p className={`mt-3 text-sm font-semibold ${msg.ok ? "text-success" : "text-destructive"}`}>{msg.text}</p>
+            <p
+              className={`mt-3 text-sm font-semibold ${msg.ok ? "text-success" : "text-destructive"}`}
+            >
+              {msg.text}
+            </p>
           )}
         </div>
 
@@ -36,7 +46,14 @@ export function CashOut({ onBack }: { onBack: () => void }) {
           disabled={amount <= 0}
           onClick={() => {
             const res = cashOut(amount);
-            setMsg(res.ok ? { ok: true, text: `Transfer sent to ${profile?.bankAccount?.bankName ?? "your bank"}` } : { ok: false, text: res.reason! });
+            setMsg(
+              res.ok
+                ? {
+                    ok: true,
+                    text: `Transfer sent to ${profile?.bankAccount?.bankName ?? "your bank"}`,
+                  }
+                : { ok: false, text: res.reason! },
+            );
             if (res.ok) setRaw("");
           }}
           className="rounded-2xl bg-primary py-4 text-base font-semibold text-primary-foreground disabled:opacity-40"

@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ScreenRouteImport } from './routes/screen'
 import { Route as PreviewComponentRouteImport } from './routes/preview.$component'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScreenRoute = ScreenRouteImport.update({
+  id: '/screen',
+  path: '/screen',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PreviewComponentRoute = PreviewComponentRouteImport.update({
@@ -25,27 +31,31 @@ const PreviewComponentRoute = PreviewComponentRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/screen': typeof ScreenRoute
   '/preview/$component': typeof PreviewComponentRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/screen': typeof ScreenRoute
   '/preview/$component': typeof PreviewComponentRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/screen': typeof ScreenRoute
   '/preview/$component': typeof PreviewComponentRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/preview/$component'
+  fullPaths: '/' | '/screen' | '/preview/$component'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/preview/$component'
-  id: '__root__' | '/' | '/preview/$component'
+  to: '/' | '/screen' | '/preview/$component'
+  id: '__root__' | '/' | '/screen' | '/preview/$component'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ScreenRoute: typeof ScreenRoute
   PreviewComponentRoute: typeof PreviewComponentRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/screen': {
+      id: '/screen'
+      path: '/screen'
+      fullPath: '/screen'
+      preLoaderRoute: typeof ScreenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/preview/$component': {
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ScreenRoute: ScreenRoute,
   PreviewComponentRoute: PreviewComponentRoute,
 }
 export const routeTree = rootRouteImport

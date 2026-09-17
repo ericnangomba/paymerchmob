@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { formatZar, usePaymerch } from "@/lib/paymerch-store";
-import { Keypad, ScreenHeader } from "./ui";
+import { Keypad, MainButton, ScreenHeader } from "./ui";
 
-export function PayMode({ onBack }: { onBack: () => void }) {
+export function PayMode({ onBack, onHome }: { onBack: () => void; onHome?: () => void }) {
   const { buyerBalance, activeQr, generateQr, clearQr } = usePaymerch();
   const [raw, setRaw] = useState("");
   const [left, setLeft] = useState(60);
@@ -31,8 +31,12 @@ export function PayMode({ onBack }: { onBack: () => void }) {
       <div className="flex flex-1 flex-col justify-between px-5 py-5">
         <div className="text-center">
           <p className="text-xs uppercase tracking-wider text-muted-foreground">Amount to pay</p>
-          <p className="mt-1 text-4xl font-bold tracking-tight text-foreground">{formatZar(amount)}</p>
-          <p className="mt-1 text-xs text-muted-foreground">Buyer wallet · {formatZar(buyerBalance)} available</p>
+          <p className="mt-1 text-4xl font-bold tracking-tight text-foreground">
+            {formatZar(amount)}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Buyer wallet · {formatZar(buyerBalance)} available
+          </p>
         </div>
 
         <Keypad
@@ -59,7 +63,9 @@ export function PayMode({ onBack }: { onBack: () => void }) {
               <QRCodeSVG value={JSON.stringify(activeQr)} size={190} level="M" />
             </div>
             <p className="mt-4 text-2xl font-bold text-foreground">{formatZar(activeQr.amt)}</p>
-            <p className={`text-sm font-semibold ${left > 10 ? "text-muted-foreground" : "text-destructive"}`}>
+            <p
+              className={`text-sm font-semibold ${left > 10 ? "text-muted-foreground" : "text-destructive"}`}
+            >
               {left > 0 ? `Expires in ${left}s` : "Token expired"}
             </p>
             <button
@@ -70,6 +76,13 @@ export function PayMode({ onBack }: { onBack: () => void }) {
               className="mt-5 w-full rounded-2xl border border-border py-3 text-sm font-semibold text-foreground hover:bg-accent"
             >
               Close
+            </button>
+            <button
+              type="button"
+              onClick={onHome ?? onBack}
+              className="mt-3 w-full rounded-2xl bg-primary py-3 text-sm font-semibold text-primary-foreground"
+            >
+              Main screen
             </button>
           </div>
         </div>

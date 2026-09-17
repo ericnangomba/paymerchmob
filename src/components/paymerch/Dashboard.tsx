@@ -5,7 +5,8 @@ import { ActionTile, StatusBadge } from "./ui";
 import type { Screen } from "./types";
 
 export function Dashboard({ go }: { go: (s: Screen) => void }) {
-  const { merchantBalance, online, setOnline, txns, pendingCount, syncPending, profile } = usePaymerch();
+  const { merchantBalance, online, setOnline, txns, pendingCount, syncPending, profile } =
+    usePaymerch();
   const [visible, setVisible] = useState(true);
 
   return (
@@ -13,9 +14,15 @@ export function Dashboard({ go }: { go: (s: Screen) => void }) {
       <header className="border-b border-border px-5 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <img src="/paymerchlogo.png" alt="Paymerch" className="size-9 rounded-xl object-contain" />
+            <img
+              src="/mlogopaymerch.png"
+              alt="Paymerch"
+              className="size-10 rounded-xl object-contain"
+            />
             <div>
-              <p className="text-sm font-semibold text-foreground">{profile?.name ?? "My business"}</p>
+              <p className="text-sm font-semibold text-foreground">
+                {profile?.name ?? "My business"}
+              </p>
               {profile && (
                 <p className="text-[10px] text-muted-foreground">
                   {profile.kind === "business" ? profile.businessType : "Individual wallet"}
@@ -41,7 +48,9 @@ export function Dashboard({ go }: { go: (s: Screen) => void }) {
 
         <div className="mt-4 rounded-2xl bg-primary p-5 text-primary-foreground">
           <p className="text-xs opacity-70">Wallet balance</p>
-          <p className="mt-1 text-3xl font-bold tracking-tight">{visible ? formatZar(merchantBalance) : "R ••••••"}</p>
+          <p className="mt-1 text-3xl font-bold tracking-tight">
+            {visible ? formatZar(merchantBalance) : "R ••••••"}
+          </p>
           {pendingCount > 0 && (
             <button
               onClick={() => syncPending()}
@@ -49,7 +58,8 @@ export function Dashboard({ go }: { go: (s: Screen) => void }) {
               className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-warning px-3 py-1 text-[11px] font-semibold text-warning-foreground disabled:opacity-60"
             >
               <RefreshCw className="size-3" />
-              {pendingCount} offline txn{pendingCount > 1 ? "s" : ""} — {online ? "sync now" : "waiting for network"}
+              {pendingCount} offline txn{pendingCount > 1 ? "s" : ""} —{" "}
+              {online ? "sync now" : "waiting for network"}
             </button>
           )}
         </div>
@@ -91,14 +101,22 @@ export function Dashboard({ go }: { go: (s: Screen) => void }) {
         </div>
 
         <div className="pt-2">
-          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Recent activity</h3>
+          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Recent activity
+          </h3>
           <ul className="space-y-2">
             {txns.slice(0, 5).map((t) => (
-              <li key={t.id} className="flex items-center justify-between rounded-2xl border border-border bg-card p-4">
+              <li
+                key={t.id}
+                className="flex items-center justify-between rounded-2xl border border-border bg-card p-4"
+              >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-foreground">{t.label}</p>
                   <p className="text-xs text-muted-foreground">
-                    {new Date(t.createdAt).toLocaleTimeString("en-ZA", { hour: "2-digit", minute: "2-digit" })}
+                    {new Date(t.createdAt).toLocaleTimeString("en-ZA", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                     {t.token ? ` · token ${t.token}` : ""}
                   </p>
                 </div>

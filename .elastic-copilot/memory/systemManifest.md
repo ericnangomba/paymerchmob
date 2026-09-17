@@ -1,11 +1,13 @@
 # System Manifest
 
 ## Project Overview
+
 - Name: pixel-perfect
 - Description: CRCT-enabled project: pixel-perfect
 - Created: 2026-09-14T12:27:05.690Z
 
 ## Current Status
+
 - Current Phase: Set-up/Maintenance
 - Last Updated: 2026-09-16T07:57:54.223Z
 
@@ -14,7 +16,6 @@
 - 9 ts files
 - 64 tsx files
 - 7 js files
-
 
 ## Dependencies
 
@@ -114,25 +115,32 @@
 - 📄 netlify.toml
 - 📄 vite.config.ts
 
-
 ## TS Dependencies
 
 ### \vite.config.ts
+
 Dependencies:
+
 - @lovable.dev/vite-tanstack-config
 
 ### \src\start.ts
+
 Dependencies:
+
 - @tanstack/react-start
 - ./lib/error-page
 
 ### \src\server.ts
+
 Dependencies:
+
 - ./lib/error-capture
 - ./lib/error-page
 
 ### \src\routeTree.gen.ts
+
 Dependencies:
+
 - ./routes/__root
 - ./routes/index
 - ./routes/preview.$component
@@ -140,21 +148,27 @@ Dependencies:
 - ./start.ts
 
 ### \src\lib\utils.ts
+
 Dependencies:
+
 - clsx
 - tailwind-merge
 
 ## TSX Dependencies
 
 ### \src\routes\__root.tsx
+
 Dependencies:
+
 - @tanstack/react-query
 - react
 - ../styles.css?url
 - ../lib/lovable-error-reporting
 
 ### \src\routes\preview.$component.tsx
+
 Dependencies:
+
 - @tanstack/react-router
 - react
 - @/lib/paymerch-store
@@ -169,18 +183,24 @@ Dependencies:
 - @/components/paymerch/SplashScreen
 
 ### \src\routes\index.tsx
+
 Dependencies:
+
 - @tanstack/react-router
 - @/components/paymerch/PaymerchApp
 
 ### \src\router.tsx
+
 Dependencies:
+
 - @tanstack/react-query
 - @tanstack/react-router
 - ./routeTree.gen
 
 ### \src\main.tsx
+
 Dependencies:
+
 - react
 - react-dom/client
 - ./components/paymerch/PaymerchApp
@@ -189,10 +209,13 @@ Dependencies:
 ## JS Dependencies
 
 ### \public\sw.js
+
 No dependencies found
 
 ### \eslint.config.js
+
 Dependencies:
+
 - @eslint/js
 - eslint-plugin-prettier/recommended
 - globals
@@ -201,15 +224,16 @@ Dependencies:
 - typescript-eslint
 
 ### \.output\public\sw.js
+
 No dependencies found
 
 ### \.output\public\assets\preview._component-kB0xsM8z.js
+
 No dependencies found
 
 ### \.output\public\assets\index-2vbCdaQc.js
+
 No dependencies found
-
-
 
 ## Project Directory Structure
 
@@ -306,25 +330,32 @@ No dependencies found
 - 📄 netlify.toml
 - 📄 vite.config.ts
 
-
 ## TS Dependencies
 
 ### \vite.config.ts
+
 Dependencies:
+
 - @lovable.dev/vite-tanstack-config
 
 ### \src\start.ts
+
 Dependencies:
+
 - @tanstack/react-start
 - ./lib/error-page
 
 ### \src\server.ts
+
 Dependencies:
+
 - ./lib/error-capture
 - ./lib/error-page
 
 ### \src\routeTree.gen.ts
+
 Dependencies:
+
 - ./routes/__root
 - ./routes/index
 - ./routes/preview.$component
@@ -332,14 +363,18 @@ Dependencies:
 - ./start.ts
 
 ### \src\lib\utils.ts
+
 Dependencies:
+
 - clsx
 - tailwind-merge
 
 ## JS Dependencies
 
 ### \eslint.config.js
+
 Dependencies:
+
 - @eslint/js
 - eslint-plugin-prettier/recommended
 - globals
@@ -348,28 +383,36 @@ Dependencies:
 - typescript-eslint
 
 ### \public\sw.js
+
 No dependencies found
 
 ### \.output\public\sw.js
+
 No dependencies found
 
 ### \.output\public\assets\SplashScreen-Defybxix.js
+
 No dependencies found
 
 ### \.output\public\assets\routes-BdjgQC25.js
+
 No dependencies found
 
 ## TSX Dependencies
 
 ### \src\routes\__root.tsx
+
 Dependencies:
+
 - @tanstack/react-query
 - react
 - ../styles.css?url
 - ../lib/lovable-error-reporting
 
 ### \src\routes\preview.$component.tsx
+
 Dependencies:
+
 - @tanstack/react-router
 - react
 - @/lib/paymerch-store
@@ -384,21 +427,25 @@ Dependencies:
 - @/components/paymerch/SplashScreen
 
 ### \src\routes\index.tsx
+
 Dependencies:
+
 - @tanstack/react-router
 - @/components/paymerch/PaymerchApp
 
 ### \src\router.tsx
+
 Dependencies:
+
 - @tanstack/react-query
 - @tanstack/react-router
 - ./routeTree.gen
 
 ### \src\lib\paymerch-store.tsx
+
 Dependencies:
+
 - react
-
-
 
 ## Project Directory Structure
 
@@ -490,67 +537,88 @@ Dependencies:
 - 📄 netlify.toml
 - 📄 vite.config.ts
 
-
 ## TS Dependencies
 
 ### \vite.config.ts
+
 Dependencies:
+
 - @lovable.dev/vite-tanstack-config
 
 ### \src\start.ts
+
 Dependencies:
+
 - @tanstack/react-start
 - ./lib/error-page
 
 ### \src\server.ts
+
 Dependencies:
+
 - ./lib/error-capture
 - ./lib/error-page
 
 ### \src\routeTree.gen.ts
+
 Dependencies:
+
 - ./routes/__root
 - ./routes/index
 - ./router.tsx
 - ./start.ts
 
 ### \src\lib\utils.ts
+
 Dependencies:
+
 - clsx
 - tailwind-merge
 
 ## TSX Dependencies
 
 ### \src\routes\__root.tsx
+
 Dependencies:
+
 - @tanstack/react-query
 - react
 - ../styles.css?url
 - ../lib/lovable-error-reporting
 
 ### \src\routes\index.tsx
+
 Dependencies:
+
 - @tanstack/react-router
 - @/components/paymerch/PaymerchApp
 
 ### \src\router.tsx
+
 Dependencies:
+
 - @tanstack/react-query
 - @tanstack/react-router
 - ./routeTree.gen
 
 ### \src\lib\paymerch-store.tsx
+
 Dependencies:
+
 - react
 
 ### \src\hooks\use-mobile.tsx
+
 Dependencies:
+
 - react
 
 ## JS Dependencies
 
 ### \eslint.config.js
+
 Dependencies:
+
 - @eslint/js
 - eslint-plugin-prettier/recommended
 - globals
@@ -559,21 +627,25 @@ Dependencies:
 - typescript-eslint
 
 ### \.output\public\assets\routes-CuzF0h3e.js
+
 No dependencies found
 
 ### \.output\public\assets\index-DlaBJV3L.js
+
 No dependencies found
 
-
-
 ## Key Components
+
 - TBD
 
 ## Integration Points
+
 - TBD
 
 ## Technical Considerations
+
 - TBD
 
 ## Implementation Notes
+
 - TBD

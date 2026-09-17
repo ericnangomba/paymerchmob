@@ -17,16 +17,27 @@ export function BankTopUp({ onBack }: { onBack: () => void }) {
           <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <Landmark className="size-7" />
           </div>
-          <p className="mt-4 text-xs uppercase tracking-wider text-muted-foreground">Bank to wallet</p>
-          <p className="mt-1 text-4xl font-bold tracking-tight text-foreground">{formatZar(amount)}</p>
+          <p className="mt-4 text-xs uppercase tracking-wider text-muted-foreground">
+            Bank to wallet
+          </p>
+          <p className="mt-1 text-4xl font-bold tracking-tight text-foreground">
+            {formatZar(amount)}
+          </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            {profile?.bankAccount?.isConfirmed ? "Confirmed bank account" : "No confirmed bank account"}
+            {profile?.bankAccount?.isConfirmed
+              ? "Confirmed bank account"
+              : "No confirmed bank account"}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Wallet {formatZar(merchantBalance)} · {profile?.bankAccount?.bankName ?? "Paymerch Bank"}
+            Wallet {formatZar(merchantBalance)} ·{" "}
+            {profile?.bankAccount?.bankName ?? "Paymerch Bank"}
           </p>
           {msg && (
-            <p className={`mt-3 text-sm font-semibold ${msg.ok ? "text-success" : "text-destructive"}`}>{msg.text}</p>
+            <p
+              className={`mt-3 text-sm font-semibold ${msg.ok ? "text-success" : "text-destructive"}`}
+            >
+              {msg.text}
+            </p>
           )}
         </div>
 
@@ -40,7 +51,11 @@ export function BankTopUp({ onBack }: { onBack: () => void }) {
           disabled={amount <= 0}
           onClick={() => {
             const res = bankToWallet(amount);
-            setMsg(res.ok ? { ok: true, text: "Bank transfer loaded to wallet" } : { ok: false, text: res.reason! });
+            setMsg(
+              res.ok
+                ? { ok: true, text: "Bank transfer loaded to wallet" }
+                : { ok: false, text: res.reason! },
+            );
             if (res.ok) setRaw("");
           }}
           className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-deep py-4 text-base font-semibold text-primary-foreground disabled:opacity-40"

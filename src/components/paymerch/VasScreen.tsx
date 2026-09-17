@@ -55,7 +55,9 @@ export function VasScreen({ onBack }: { onBack: () => void }) {
         </label>
 
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Value</span>
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Value
+          </span>
           <div className="mt-2 grid grid-cols-4 gap-2">
             {VALUES.map((v) => (
               <button
@@ -85,11 +87,14 @@ export function VasScreen({ onBack }: { onBack: () => void }) {
           <div className="rounded-2xl border border-success/30 bg-success/10 p-5">
             <p className="text-sm font-semibold text-foreground">{receipt.label}</p>
             <p className="text-xs text-muted-foreground">
-              {formatZar(receipt.amount)} · {receipt.status === "SUCCESS" ? "Vended" : "Queued offline"}
+              {formatZar(receipt.amount)} ·{" "}
+              {receipt.status === "SUCCESS" ? "Vended" : "Queued offline"}
             </p>
             {receipt.token && (
               <div className="mt-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">STS token</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  STS token
+                </p>
                 <div className="mt-1 flex items-center gap-2">
                   <code className="flex-1 rounded-xl bg-card px-3 py-2 text-sm tracking-widest text-foreground">
                     {receipt.token.replace(/(\d{4})(?=\d)/g, "$1 ")}

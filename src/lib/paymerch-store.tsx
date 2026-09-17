@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 
 export type TxnType = "MERCHANT_PAY" | "VAS_ELEC" | "VAS_AIRTIME" | "TOPUP" | "CASHOUT" | "BANK_DEPOSIT";
 export type TxnStatus = "SUCCESS" | "PENDING" | "FAILED";
@@ -69,9 +77,67 @@ export const PAYMERCH_BANK_ACCOUNT = {
   accountType: "Wallet" as const,
 };
 
+function base64UrlToUint8Array(base64Url: string): Uint8Array {
+  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = base64.padEnd(base64.length + (4 - (base64.length % 4)) % 4, "=");
+  const binary = atob(padded);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+async function hashPin(pin: string, salt: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(salt + pin);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function generateSalt(): string {
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  return Array.from(array).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function generateChallenge(): BufferSource {
+  const view = new Uint8Array(new ArrayBuffer(32)) as Uint8Array<ArrayBuffer>;
+  return crypto.getRandomValues(view);
+}
+
+const loadFromStorage = <T,>(key: string): T | null => {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : null;
+  } catch {
+    return null;
+  }
+};
+
+const saveToStorage = (key: string, value: unknown): void => {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* ignore */
+  }
+};
+
+const removeFromStorage = (key: string): void => {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    /* ignore */
+  }
+};
+
 type Store = {
   profile: Profile | null;
   register: (p: Profile) => void;
+  pinSet: boolean;
+  lockout: { locked: boolean; until: number | null };
   buyerBalance: number;
   merchantBalance: number;
   online: boolean;
@@ -86,22 +152,172 @@ type Store = {
   cashOut: (amount: number) => { ok: boolean; reason?: string };
   bankToWallet: (amount: number) => { ok: boolean; reason?: string };
   syncPending: () => number;
+  createPin: (pin: string) => Promise<void>;
+  verifyPin: (pin: string) => Promise<{ ok: boolean; locked: boolean }>;
+  clearPin: () => void;
+  webauthnSupported: boolean;
+  credentialId: string | null;
+  registerBiometric: () => Promise<{ ok: boolean; error?: string }>;
+  authenticateBiometric: () => Promise<{ ok: boolean; error?: string }>;
+  clearBiometric: () => void;
 };
 
 const Ctx = createContext<Store | null>(null);
 
 export function PaymerchProvider({ children }: { children: ReactNode }) {
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const register = useCallback((p: Profile) => setProfile(p), []);
-  const [buyerBalance, setBuyerBalance] = useState(1250);
-  const [merchantBalance, setMerchantBalance] = useState(4820.5);
-  const [online, setOnline] = useState(true);
+  const [profile, setProfile] = useState<Profile | null>(() => loadFromStorage<Profile | null>("pm_profile"));
+  const register = useCallback((p: Profile) => {
+    setProfile(p);
+    saveToStorage("pm_profile", p);
+  }, []);
+  const [pinVerifier, setPinVerifier] = useState<{ salt: string; hash: string } | null>(() =>
+    loadFromStorage<{ salt: string; hash: string } | null>("pm_pin"),
+  );
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [lockedUntil, setLockedUntil] = useState<number | null>(null);
+  const [buyerBalance, setBuyerBalance] = useState(() => loadFromStorage<number>("pm_buyerBalance") ?? 1250);
+  const [merchantBalance, setMerchantBalance] = useState(
+    () => loadFromStorage<number>("pm_merchantBalance") ?? 4820.5,
+  );
+  const [online, setOnline] = useState(() => loadFromStorage<boolean>("pm_online") ?? true);
   const [activeQr, setActiveQr] = useState<QrPayload | null>(null);
-  const [txns, setTxns] = useState<Txn[]>([
-    { id: rand(8), label: "Sale · Walk-in buyer", amount: 45, type: "MERCHANT_PAY", status: "SUCCESS", createdAt: Date.now() - 3.6e6 },
-    { id: rand(8), label: "Airtime · 082 445 1190", amount: 20, type: "VAS_AIRTIME", status: "SUCCESS", createdAt: Date.now() - 7.2e6 },
-    { id: rand(8), label: "Sale · Taxi fare", amount: 15, type: "MERCHANT_PAY", status: "SUCCESS", createdAt: Date.now() - 1.1e7 },
-  ]);
+  const [txns, setTxns] = useState<Txn[]>(() =>
+    loadFromStorage<Txn[]>("pm_txns") ?? [
+      { id: rand(8), label: "Sale · Walk-in buyer", amount: 45, type: "MERCHANT_PAY", status: "SUCCESS", createdAt: Date.now() - 3.6e6 },
+      { id: rand(8), label: "Airtime · 082 445 1190", amount: 20, type: "VAS_AIRTIME", status: "SUCCESS", createdAt: Date.now() - 7.2e6 },
+      { id: rand(8), label: "Sale · Taxi fare", amount: 15, type: "MERCHANT_PAY", status: "SUCCESS", createdAt: Date.now() - 1.1e7 },
+    ],
+  );
+
+  useEffect(() => { saveToStorage("pm_profile", profile); }, [profile]);
+  useEffect(() => { if (pinVerifier) saveToStorage("pm_pin", pinVerifier); else removeFromStorage("pm_pin"); }, [pinVerifier]);
+  useEffect(() => { saveToStorage("pm_buyerBalance", buyerBalance); }, [buyerBalance]);
+  useEffect(() => { saveToStorage("pm_merchantBalance", merchantBalance); }, [merchantBalance]);
+  useEffect(() => { saveToStorage("pm_online", online); }, [online]);
+  useEffect(() => { saveToStorage("pm_txns", txns); }, [txns]);
+
+  const pinSet = pinVerifier !== null;
+
+  const createPin = useCallback(async (pin: string): Promise<void> => {
+    const salt = generateSalt();
+    const hash = await hashPin(pin, salt);
+    setPinVerifier({ salt, hash });
+  }, []);
+
+  const clearPin = useCallback(() => {
+    setPinVerifier(null);
+    setFailedAttempts(0);
+    setLockedUntil(null);
+  }, []);
+
+  const verifyPin = useCallback(
+    async (pin: string): Promise<{ ok: boolean; locked: boolean }> => {
+      if (lockedUntil && Date.now() < lockedUntil) return { ok: false, locked: true };
+      if (lockedUntil && Date.now() >= lockedUntil) {
+        setLockedUntil(null);
+        setFailedAttempts(0);
+      }
+      if (!pinVerifier) return { ok: false, locked: false };
+      const hash = await hashPin(pin, pinVerifier.salt);
+      if (hash === pinVerifier.hash) {
+        setFailedAttempts(0);
+        return { ok: true, locked: false };
+      }
+      const next = failedAttempts + 1;
+      setFailedAttempts(next);
+      if (next >= 5) {
+        const until = Date.now() + 5 * 60 * 1000;
+        setLockedUntil(until);
+        return { ok: false, locked: true };
+      }
+      return { ok: false, locked: false };
+    },
+    [pinVerifier, lockedUntil, failedAttempts],
+  );
+
+  const webauthnSupported =
+    typeof window !== "undefined" &&
+    "credentials" in navigator &&
+    !!navigator.credentials?.create &&
+    !!navigator.credentials?.get;
+
+  const [credentialId, setCredentialId] = useState<string | null>(() =>
+    loadFromStorage<string | null>("pm_credentialId"),
+  );
+
+  useEffect(() => {
+    if (credentialId) saveToStorage("pm_credentialId", credentialId);
+    else removeFromStorage("pm_credentialId");
+  }, [credentialId]);
+
+  const registerBiometric = useCallback(
+    async (): Promise<{ ok: boolean; error?: string }> => {
+      if (!webauthnSupported) return { ok: false, error: "Biometrics not supported in this browser" };
+      if (credentialId) return { ok: false, error: "Biometric already registered" };
+      if (typeof window === "undefined" || !navigator.credentials?.create) {
+        return { ok: false, error: "Biometrics not supported" };
+      }
+      try {
+        const credential = (await navigator.credentials.create({
+          publicKey: {
+            challenge: generateChallenge(),
+            rp: { id: window.location.hostname, name: "Paymerch" },
+            user: {
+              id: crypto.getRandomValues(new Uint8Array(new ArrayBuffer(16)) as Uint8Array<ArrayBuffer>),
+              name: "paymerch-user",
+              displayName: "Paymerch User",
+            },
+            pubKeyCredParams: [
+              { type: "public-key", alg: -7 },
+              { type: "public-key", alg: -8 },
+            ],
+            authenticatorSelection: { userVerification: "required", requireResidentKey: true },
+            timeout: 60000,
+            attestation: "none",
+          },
+        })) as PublicKeyCredential | null;
+        const cred = credential as PublicKeyCredential | null;
+        if (!cred?.response || !("rawId" in cred.response)) return { ok: false, error: "Credential creation failed" };
+        setCredentialId(cred.id);
+        return { ok: true };
+      } catch (err: any) {
+        if (err.name === "NotAllowedError") return { ok: false, error: "Biometric registration cancelled" };
+        if (err.name === "SecurityError") return { ok: false, error: "Biometric registration blocked" };
+        return { ok: false, error: err.message || "Biometric registration failed" };
+      }
+    },
+    [webauthnSupported, credentialId],
+  );
+
+  const authenticateBiometric = useCallback(
+    async (): Promise<{ ok: boolean; error?: string }> => {
+      if (!webauthnSupported || !credentialId) return { ok: false, error: "Biometrics not available" };
+      if (typeof window === "undefined" || !navigator.credentials?.get) {
+        return { ok: false, error: "Biometrics not supported" };
+      }
+      try {
+        const assertion = (await navigator.credentials.get({
+          publicKey: {
+            challenge: generateChallenge(),
+            allowCredentials: [{ id: base64UrlToUint8Array(credentialId) as BufferSource, type: "public-key" }],
+            userVerification: "required",
+            timeout: 60000,
+          },
+        })) as PublicKeyCredential | null;
+        if (!assertion?.response) return { ok: false, error: "Authentication failed" };
+        return { ok: true };
+      } catch (err: any) {
+        if (err.name === "NotAllowedError") return { ok: false, error: "Biometric authentication cancelled" };
+        if (err.name === "SecurityError") return { ok: false, error: "Biometric authentication blocked" };
+        return { ok: false, error: err.message || "Biometric authentication failed" };
+      }
+    },
+    [webauthnSupported, credentialId],
+  );
+
+  const clearBiometric = useCallback(() => {
+    setCredentialId(null);
+  }, []);
 
   const push = useCallback((t: Txn) => setTxns((prev) => [t, ...prev]), []);
 
@@ -161,9 +377,7 @@ export function PaymerchProvider({ children }: { children: ReactNode }) {
 
   const cashOut = useCallback(
     (amount: number) => {
-      if (!profile?.bankAccount?.isConfirmed) {
-        return { ok: false, reason: "Confirm your bank account before cashing out" };
-      }
+      if (!profile?.bankAccount?.isConfirmed) return { ok: false, reason: "Confirm your bank account before cashing out" };
       if (!online) return { ok: false, reason: "Cash out needs a live connection" };
       if (amount > merchantBalance) return { ok: false, reason: "Amount exceeds wallet balance" };
       setMerchantBalance((m) => m - amount);
@@ -175,9 +389,7 @@ export function PaymerchProvider({ children }: { children: ReactNode }) {
 
   const bankToWallet = useCallback(
     (amount: number) => {
-      if (!profile?.bankAccount?.isConfirmed) {
-        return { ok: false, reason: "Confirm your bank account before loading the wallet" };
-      }
+      if (!profile?.bankAccount?.isConfirmed) return { ok: false, reason: "Confirm your bank account before loading the wallet" };
       if (!online) return { ok: false, reason: "Bank transfer needs a live connection" };
       if (amount <= 0) return { ok: false, reason: "Enter a valid bank transfer amount" };
       setMerchantBalance((m) => m + amount);
@@ -204,6 +416,8 @@ export function PaymerchProvider({ children }: { children: ReactNode }) {
     () => ({
       profile,
       register,
+      pinSet,
+      lockout: { locked: lockedUntil !== null && Date.now() < lockedUntil, until: lockedUntil },
       buyerBalance,
       merchantBalance,
       online,
@@ -218,8 +432,20 @@ export function PaymerchProvider({ children }: { children: ReactNode }) {
       cashOut,
       bankToWallet,
       syncPending,
+      createPin,
+      verifyPin,
+      clearPin,
+      webauthnSupported,
+      credentialId,
+      registerBiometric,
+      authenticateBiometric,
+      clearBiometric,
     }),
-    [profile, register, buyerBalance, merchantBalance, online, txns, activeQr, generateQr, settleQr, sellVas, cashOut, bankToWallet, syncPending],
+    [
+      profile, register, pinSet, lockedUntil, buyerBalance, merchantBalance, online, txns, activeQr,
+      generateQr, settleQr, sellVas, cashOut, bankToWallet, syncPending, createPin, verifyPin, clearPin,
+      webauthnSupported, credentialId, registerBiometric, authenticateBiometric, clearBiometric,
+    ],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

@@ -1,6 +1,6 @@
 # Dependency Matrix
 
-*Generated: 2026-09-16T07:58:02.726Z*
+_Generated: 2026-09-16T07:58:02.726Z_
 
 ## Summary
 
@@ -18,6 +18,7 @@
 ### TS
 
 Top dependencies:
+
 - @lovable.dev/vite-tanstack-config
 - @tanstack/react-start
 - ./lib/error-page
@@ -32,6 +33,7 @@ Top dependencies:
 ### TSX
 
 Top dependencies:
+
 - @tanstack/react-query
 - react
 - ../styles.css?url
@@ -46,10 +48,10 @@ Top dependencies:
 ### JS
 
 Top dependencies:
+
 - @eslint/js
 - eslint-plugin-prettier/recommended
 - globals
 - eslint-plugin-react-hooks
 - eslint-plugin-react-refresh
 - typescript-eslint
-

@@ -1,3 +1,4 @@
+import { Home } from "lucide-react";
 import { type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -9,7 +10,12 @@ export function StatusBadge({ status }: { status: "SUCCESS" | "PENDING" | "FAILE
   } as const;
   const label = { SUCCESS: "Success", PENDING: "Pending sync", FAILED: "Failed" }[status];
   return (
-    <span className={cn("rounded-full border px-2.5 py-1 text-[11px] font-semibold tracking-wide", map[status])}>
+    <span
+      className={cn(
+        "rounded-full border px-2.5 py-1 text-[11px] font-semibold tracking-wide",
+        map[status],
+      )}
+    >
       {label}
     </span>
   );
@@ -59,7 +65,9 @@ export function Keypad({
           {k}
         </KeypadKey>
       ))}
-      <KeypadKey onPress={extra ? extra.onPress : () => onDigit(".")}>{extra ? extra.label : "."}</KeypadKey>
+      <KeypadKey onPress={extra ? extra.onPress : () => onDigit(".")}>
+        {extra ? extra.label : "."}
+      </KeypadKey>
       <KeypadKey onPress={() => onDigit("0")}>0</KeypadKey>
       <KeypadKey onPress={onBackspace}>⌫</KeypadKey>
     </div>
@@ -84,12 +92,26 @@ export function ScreenHeader({ title, onBack }: { title: string; onBack: () => v
       <button
         onClick={onBack}
         className="flex size-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-accent"
-        aria-label="Go back home"
+        aria-label="Return to main screen"
       >
-        <span aria-hidden="true" className="text-lg leading-none">←</span>
+        <Home className="size-4" aria-hidden="true" />
       </button>
-      <img src="/paymerchlogo.png" alt="Paymerch" className="size-8 rounded-xl object-contain" />
+      <img src="/mlogopaymerch.png" alt="Paymerch" className="size-10 rounded-xl object-contain" />
       <h2 className="text-base font-semibold text-foreground">{title}</h2>
     </div>
+  );
+}
+
+export function MainButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label="Return to main screen"
+      className="absolute bottom-4 right-4 z-30 flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground shadow-panel transition-opacity hover:opacity-90"
+    >
+      <Home className="size-4" aria-hidden="true" />
+      Main
+    </button>
   );
 }
