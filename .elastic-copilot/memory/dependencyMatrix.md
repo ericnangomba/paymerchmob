@@ -1,39 +1,37 @@
 # Dependency Matrix
 
-_Generated: 2026-09-16T07:58:02.726Z_
+*Generated: 2026-09-18T11:05:25.607Z*
 
 ## Summary
 
-- Files analyzed: 80
+- Files analyzed: 83
 - File types: ts, tsx, js
 
 ## File Type Distribution
 
 - 9 ts files
-- 64 tsx files
-- 7 js files
+- 66 tsx files
+- 8 js files
 
 ## Key Dependencies by Type
 
 ### TS
 
 Top dependencies:
-
 - @lovable.dev/vite-tanstack-config
 - @tanstack/react-start
 - ./lib/error-page
 - ./lib/error-capture
 - ./routes/__root
 - ./routes/index
+- ./routes/screen
 - ./routes/preview.$component
 - ./router.tsx
 - ./start.ts
-- clsx
 
 ### TSX
 
 Top dependencies:
-
 - @tanstack/react-query
 - react
 - ../styles.css?url
@@ -48,10 +46,10 @@ Top dependencies:
 ### JS
 
 Top dependencies:
-
 - @eslint/js
 - eslint-plugin-prettier/recommended
 - globals
 - eslint-plugin-react-hooks
 - eslint-plugin-react-refresh
 - typescript-eslint
+

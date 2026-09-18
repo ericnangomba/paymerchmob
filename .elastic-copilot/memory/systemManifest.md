@@ -9,15 +9,210 @@
 ## Current Status
 
 - Current Phase: Set-up/Maintenance
-- Last Updated: 2026-09-16T07:57:54.223Z
+- Last Updated: 2026-09-18T11:05:15.524Z
 
 ## Project Structure
 
 - 9 ts files
-- 64 tsx files
-- 7 js files
+- 66 tsx files
+- 8 js files
+
 
 ## Dependencies
+
+## Project Directory Structure
+
+- 📂 public/
+  - 📄 favicon.ico
+  - 📄 favicon.png
+  - 📄 manifest.webmanifest
+  - 📄 mlogopaymerch.png
+  - 📄 paymerchlogo.png
+  - 📄 robots.txt
+  - 📄 sw.js
+- 📂 src/
+  - 📂 assets/
+  - 📂 components/
+    - 📂 paymerch/
+      - 📄 AuthScreen.tsx
+      - 📄 BankTopUp.tsx
+      - 📄 CashOut.tsx
+      - 📄 Dashboard.tsx
+      - 📄 PaymerchApp.tsx
+      - 📄 PayMode.tsx
+      - 📄 PinSetupScreen.tsx
+      - 📄 RegisterScreen.tsx
+      - 📄 Scanner.tsx
+      - 📄 SplashScreen.tsx
+      - 📄 types.ts
+      - 📄 ui.tsx
+      - 📄 VasScreen.tsx
+    - 📂 ui/
+      - 📄 accordion.tsx
+      - 📄 alert-dialog.tsx
+      - 📄 alert.tsx
+      - 📄 aspect-ratio.tsx
+      - 📄 avatar.tsx
+      - 📄 badge.tsx
+      - 📄 breadcrumb.tsx
+      - 📄 button.tsx
+      - 📄 calendar.tsx
+      - 📄 card.tsx
+      - 📄 carousel.tsx
+      - 📄 chart.tsx
+      - 📄 checkbox.tsx
+      - 📄 collapsible.tsx
+      - 📄 command.tsx
+      - 📄 context-menu.tsx
+      - 📄 dialog.tsx
+      - 📄 drawer.tsx
+      - 📄 dropdown-menu.tsx
+      - 📄 form.tsx
+      - 📄 hover-card.tsx
+      - 📄 input-otp.tsx
+      - 📄 input.tsx
+      - 📄 label.tsx
+      - 📄 menubar.tsx
+      - 📄 navigation-menu.tsx
+      - 📄 pagination.tsx
+      - 📄 popover.tsx
+      - 📄 progress.tsx
+      - 📄 radio-group.tsx
+      - 📄 resizable.tsx
+      - 📄 scroll-area.tsx
+      - 📄 select.tsx
+      - 📄 separator.tsx
+      - 📄 sheet.tsx
+      - 📄 sidebar.tsx
+      - 📄 skeleton.tsx
+      - 📄 slider.tsx
+      - 📄 sonner.tsx
+      - 📄 switch.tsx
+      - 📄 table.tsx
+      - 📄 tabs.tsx
+      - 📄 textarea.tsx
+      - 📄 toggle-group.tsx
+      - 📄 toggle.tsx
+      - 📄 tooltip.tsx
+  - 📂 hooks/
+    - 📄 use-mobile.tsx
+  - 📂 lib/
+    - 📄 error-capture.ts
+    - 📄 error-page.ts
+    - 📄 lovable-error-reporting.ts
+    - 📄 paymerch-store.tsx
+    - 📄 utils.ts
+  - 📂 routes/
+    - 📄 __root.tsx
+    - 📄 index.tsx
+    - 📄 preview.$component.tsx
+    - 📄 screen.tsx
+  - 📄 main.tsx
+  - 📄 router.tsx
+  - 📄 routeTree.gen.ts
+  - 📄 server.ts
+  - 📄 start.ts
+  - 📄 styles.css
+- 📄 bunfig.toml
+- 📄 eslint.config.js
+- 📄 index.html
+- 📄 netlify.toml
+- 📄 vite.config.ts
+
+
+## TS Dependencies
+
+### \vite.config.ts
+Dependencies:
+- @lovable.dev/vite-tanstack-config
+
+### \src\start.ts
+Dependencies:
+- @tanstack/react-start
+- ./lib/error-page
+
+### \src\server.ts
+Dependencies:
+- ./lib/error-capture
+- ./lib/error-page
+
+### \src\routeTree.gen.ts
+Dependencies:
+- ./routes/__root
+- ./routes/index
+- ./routes/screen
+- ./routes/preview.$component
+- ./router.tsx
+- ./start.ts
+
+### \src\lib\utils.ts
+Dependencies:
+- clsx
+- tailwind-merge
+
+## TSX Dependencies
+
+### \src\routes\__root.tsx
+Dependencies:
+- @tanstack/react-query
+- react
+- ../styles.css?url
+- ../lib/lovable-error-reporting
+
+### \src\routes\screen.tsx
+Dependencies:
+- @tanstack/react-router
+
+### \src\routes\preview.$component.tsx
+Dependencies:
+- @tanstack/react-router
+- react
+- @/lib/paymerch-store
+- @/components/paymerch/AuthScreen
+- @/components/paymerch/RegisterScreen
+- @/components/paymerch/Dashboard
+- @/components/paymerch/PayMode
+- @/components/paymerch/Scanner
+- @/components/paymerch/VasScreen
+- @/components/paymerch/CashOut
+- @/components/paymerch/BankTopUp
+- @/components/paymerch/SplashScreen
+
+### \src\routes\index.tsx
+Dependencies:
+- @tanstack/react-router
+- @/components/paymerch/PaymerchApp
+
+### \src\router.tsx
+Dependencies:
+- @tanstack/react-query
+- @tanstack/react-router
+- ./routeTree.gen
+
+## JS Dependencies
+
+### \public\sw.js
+No dependencies found
+
+### \eslint.config.js
+Dependencies:
+- @eslint/js
+- eslint-plugin-prettier/recommended
+- globals
+- eslint-plugin-react-hooks
+- eslint-plugin-react-refresh
+- typescript-eslint
+
+### \.output\public\sw.js
+No dependencies found
+
+### \.output\public\assets\SplashScreen-CPErVkrc.js
+No dependencies found
+
+### \.output\public\assets\screen-DJ7LAi8J.js
+No dependencies found
+
+
 
 ## Project Directory Structure
 
