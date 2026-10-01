@@ -1,11 +1,6 @@
 [build]
   command = "bun run build"
-  publish = "dist/client"
-
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/server/:splat"
-  status = 200
+  publish = "dist"
 
 [[redirects]]
   from = "/*"
