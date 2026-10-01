@@ -150,29 +150,36 @@
 @layer base {
   * {
     border-color: var(--color-border);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    overscroll-behavior: none;
   }
 
   body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin: 0;
     background-color: var(--color-background);
     color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overscroll-behavior-y: none;
+  }
+
+  #root {
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 }
 
 @layer components {
   .splash-screen {
     overflow: hidden;
-    background:
-      radial-gradient(
-        circle at 50% 35%,
-        color-mix(in oklch, var(--brand) 22%, transparent),
-        transparent 22%
-      ),
-      radial-gradient(
-        circle at 50% 75%,
-        color-mix(in oklch, var(--accent) 16%, transparent),
-        transparent 24%
-      ),
-      var(--background);
+    background: var(--background);
   }
 
   .splash-logo-wrap {
@@ -181,12 +188,14 @@
     align-items: center;
     justify-content: center;
     animation: splash-logo-rise 780ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    will-change: transform, opacity;
   }
 
   .splash-logo {
-    filter: drop-shadow(0 14px 28px color-mix(in oklch, var(--brand-deep) 25%, transparent));
+    filter: drop-shadow(0 14px 28px color-mix(in oklch, var(--brand-deep) 12%, transparent));
     opacity: 0;
-    animation: splash-logo-fade 680ms ease-out 160ms forwards;
+    animation: splash-logo-fade 680ms ease-out 160ms forwards, splash-logo-breathe 3.5s ease-in-out 1.2s infinite;
+    transform-origin: center;
   }
 
   .splash-mobile {
@@ -225,6 +234,16 @@
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes splash-logo-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
   }
 }
 
