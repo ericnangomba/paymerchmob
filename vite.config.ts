@@ -27,10 +27,12 @@ export default defineConfig({
   },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    // nitro/vite builds from this
+    // nitro/vite builds from this.
+    // Netlify currently fails during prerender because the preview plugin expects a generated
+    // dist/server/server.js that isn't produced in this setup, so disable prerender here.
     server: { entry: "server" },
     prerender: {
-      enabled: true,
+      enabled: false,
     },
   },
 });
