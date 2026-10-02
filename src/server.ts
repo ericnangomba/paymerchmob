@@ -7,6 +7,12 @@ type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
 };
 
+type WorkerEnv = {
+  ASSETS?: {
+    fetch: (request: Request) => Promise<Response> | Response;
+  };
+};
+
 let serverEntryPromise: Promise<ServerEntry> | undefined;
 
 async function getServerEntry(): Promise<ServerEntry> {
@@ -48,7 +54,19 @@ export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
-      const response = await handler.fetch(request, env, ctx);
+      let response = await handler.fetch(request, env, ctx);
+      const url = new URL(request.url);
+      const workerEnv = env as WorkerEnv;
+
+      if (
+        response.status === 404 &&
+        (request.method === "GET" || request.method === "HEAD") &&
+        /\.[a-z\d]+$/i.test(url.pathname) &&
+        workerEnv.ASSETS
+      ) {
+        response = await workerEnv.ASSETS.fetch(request);
+      }
+
       return await normalizeCatastrophicSsrResponse(response);
     } catch (error) {
       console.error(error);
