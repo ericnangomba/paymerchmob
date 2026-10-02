@@ -3,7 +3,7 @@
   "name": "paymerchmob",
   "compatibility_date": "2026-10-02",
   "compatibility_flags": ["nodejs_compat"],
-  "main": "dist/server/index.js",
+  "main": "src/server.ts",
   "assets": {
     "binding": "ASSETS",
     "directory": "dist/client",
