@@ -1,11 +1,12 @@
-const CACHE_NAME = "paymerch-cache-v2";
+const CACHE_NAME = "paymerch-cache-v3";
+const APP_BASE = new URL("./", self.location).toString();
 const ASSETS = [
-  "/",
-  "/index.html",
-  "/manifest.webmanifest",
-  "/favicon.ico",
-  "/favicon.png",
-  "/mlogopaymerch.png",
+  APP_BASE,
+  new URL("./index.html", self.location).toString(),
+  new URL("./manifest.webmanifest", self.location).toString(),
+  new URL("./favicon.ico", self.location).toString(),
+  new URL("./favicon.png", self.location).toString(),
+  new URL("./mlogopaymerch.png", self.location).toString(),
 ];
 
 self.addEventListener("install", (event) => {
@@ -49,7 +50,11 @@ self.addEventListener("fetch", (event) => {
         }
         return response;
       } catch {
-        return caches.match(request) || caches.match("/") || caches.match("/index.html");
+        return (
+          caches.match(request) ||
+          caches.match(APP_BASE) ||
+          caches.match(new URL("./index.html", self.location).toString())
+        );
       }
     })(),
   );
