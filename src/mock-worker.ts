@@ -62,6 +62,8 @@ function normalizeOrigin(value: string | null): string | null {
 function getCorsOrigin(request: Request, env: DemoEnv): string | null {
   const origin = normalizeOrigin(request.headers.get("origin"));
   if (!origin) return null;
+  const hostname = new URL(origin).hostname;
+  if (hostname === "paymerchmob.vercel.app" || hostname.endsWith(".vercel.app")) return origin;
   const allowed = (env.CORS_ALLOWED_ORIGINS ?? "")
     .split(",")
     .map((value) => value.trim())

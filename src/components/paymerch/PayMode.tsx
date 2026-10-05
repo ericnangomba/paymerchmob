@@ -27,7 +27,7 @@ export function PayMode({ onBack, onHome }: { onBack: () => void; onHome?: () =>
       <ScreenHeader title="Pay mode" onBack={onBack} />
       <div className="flex flex-1 flex-col justify-between px-5 py-5">
         <div className="text-center">
-          <p className="text-xs font-semibold uppercase text-warning">Mock bank · test funds only</p>
+          <p className="text-xs font-semibold uppercase text-warning">Shared mock ledger · test funds only</p>
           <p className="text-xs uppercase tracking-wider text-muted-foreground">Amount to pay</p>
           <p className="mt-1 text-4xl font-bold tracking-tight text-foreground">
             {formatZar(amount)}
@@ -77,7 +77,7 @@ export function PayMode({ onBack, onHome }: { onBack: () => void; onHome?: () =>
             >
               {left > 0 ? `Expires in ${left}s` : "Token expired"}
             </p>
-            <p className="mt-2 text-xs text-muted-foreground">Local mock approval only. No real money moves.</p>
+            <p className="mt-2 text-xs text-muted-foreground">Simulated approval only. No real money moves.</p>
             <button
               onClick={() => {
                 clearQr();

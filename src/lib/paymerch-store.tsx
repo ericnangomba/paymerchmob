@@ -171,6 +171,7 @@ type Store = {
 
 const Ctx = createContext<Store | null>(null);
 
+const DEFAULT_DEMO_GATEWAY_URL = "https://paymerchmob.ericnangomba.workers.dev";
 const paymentGatewayUrl = import.meta.env.VITE_PAYMENT_GATEWAY_URL;
 
 async function gatewayRequest<T>(
@@ -179,7 +180,8 @@ async function gatewayRequest<T>(
   headers?: HeadersInit,
   method: "GET" | "POST" = "POST",
 ): Promise<T> {
-  const baseUrl = paymentGatewayUrl || (import.meta.env.DEV ? "http://127.0.0.1:8780" : window.location.origin);
+  const baseUrl = paymentGatewayUrl ||
+    (import.meta.env.DEV ? "http://127.0.0.1:8780" : DEFAULT_DEMO_GATEWAY_URL);
 
   let response: Response;
   try {
@@ -192,9 +194,16 @@ async function gatewayRequest<T>(
     throw new Error("Payment gateway is unreachable. Start the local mock bank or check the configured gateway.");
   }
 
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    throw new Error(
+      `Payment gateway returned ${contentType || "no content type"} (HTTP ${response.status}), not JSON. Deploy the PayMerch Cloudflare API Worker and check its URL.`,
+    );
+  }
+
   const result = (await response.json().catch(() => null)) as (T & { error?: string }) | null;
   if (!response.ok || !result) {
-    throw new Error(result?.error ?? `Payment gateway request failed (${response.status})`);
+    throw new Error(result?.error ?? `Payment gateway request failed (HTTP ${response.status})`);
   }
   return result;
 }
