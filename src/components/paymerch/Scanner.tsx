@@ -8,7 +8,7 @@ type PermissionState = "prompt" | "granted" | "denied" | "loading";
 type DecodedResult = { getText(): string };
 
 export function Scanner({ onBack }: { onBack: () => void }) {
-  const { settleQr, online } = usePaymerch();
+  const { settleQr } = usePaymerch();
   const [result, setResult] = useState<{ ok: boolean; text: string } | null>(null);
   const [payload, setPayload] = useState<QrPayload | null>(null);
   const [permission, setPermission] = useState<PermissionState>("prompt");
@@ -18,6 +18,7 @@ export function Scanner({ onBack }: { onBack: () => void }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const controlsRef = useRef<IScannerControls | null>(null);
   const activeRef = useRef(false);
+  const processingRef = useRef(false);
   const mountedRef = useRef(false);
   const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastErrorRef = useRef<{ text: string; at: number } | null>(null);
@@ -46,25 +47,25 @@ export function Scanner({ onBack }: { onBack: () => void }) {
   }, []);
 
   const handleScanResult = useCallback(
-    (decoded: DecodedResult) => {
-      if (!activeRef.current) return;
+    async (decoded: DecodedResult) => {
+      if (!activeRef.current || processingRef.current) return;
       const text = decoded.getText();
       let parsed: QrPayload | null = null;
       try {
         const value = JSON.parse(text) as Partial<QrPayload>;
         if (
           value &&
-          typeof value.ver === "string" &&
+          value.ver === "1.0" &&
           typeof value.txn_token === "string" &&
-          value.txn_token.length > 0 &&
+          /^pm_[a-f0-9]{32}$/.test(value.txn_token) &&
           typeof value.buyer_wallet === "string" &&
           typeof value.amt === "number" &&
           Number.isFinite(value.amt) &&
           value.amt > 0 &&
           value.cur === "ZAR" &&
-          typeof value.exp === "number" &&
+          Number.isInteger(value.exp) &&
           typeof value.sig === "string" &&
-          value.sig.length > 0
+          /^[a-f0-9]{64}$/.test(value.sig)
         ) {
           parsed = value as QrPayload;
         }
@@ -77,20 +78,23 @@ export function Scanner({ onBack }: { onBack: () => void }) {
         return;
       }
 
+      processingRef.current = true;
       activeRef.current = false;
       setPayload(parsed);
-      const res = settleQr(parsed);
-      setResult({
-        ok: res.ok,
-        text: res.ok
-          ? online
-            ? `Payment of ${new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR" }).format(parsed.amt)} received`
-            : `${new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR" }).format(parsed.amt)} cached offline — will sync when back online`
-          : res.reason ?? "Transaction declined",
-      });
       stopScan();
+      try {
+        const res = await settleQr(parsed);
+        setResult({
+          ok: res.ok,
+          text: res.ok
+            ? `Mock bank approved ${new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR" }).format(parsed.amt)}`
+            : res.reason ?? "Transaction declined",
+        });
+      } finally {
+        processingRef.current = false;
+      }
     },
-    [online, settleQr, showError, stopScan],
+    [settleQr, showError, stopScan],
   );
 
   const startScan = useCallback(async () => {
@@ -107,7 +111,7 @@ export function Scanner({ onBack }: { onBack: () => void }) {
     try {
       const reader = new BrowserQRCodeReader();
       const controls = await reader.decodeFromVideoDevice(undefined, video, (decoded) => {
-        if (decoded) handleScanResult(decoded);
+        if (decoded) void handleScanResult(decoded);
       });
       if (!mountedRef.current) {
         controls.stop();
@@ -206,11 +210,7 @@ export function Scanner({ onBack }: { onBack: () => void }) {
               )}
               <p className="text-sm font-semibold text-foreground">{result.text}</p>
             </div>
-            {payload && (
-              <pre className="mt-3 overflow-x-auto rounded-xl bg-secondary p-3 text-[10px] leading-relaxed text-muted-foreground">
-                {JSON.stringify(payload, null, 2)}
-              </pre>
-            )}
+            {payload && result.ok && <p className="mt-2 text-xs text-muted-foreground">Prototype ledger only · no funds moved through a bank.</p>}
           </div>
         )}
       </div>

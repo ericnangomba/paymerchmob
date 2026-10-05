@@ -10,6 +10,9 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+static-dist
+static-check
+payment-build*
 .output
 .vinxi
 .tanstack/**

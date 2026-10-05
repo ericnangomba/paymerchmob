@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -33,6 +34,12 @@ export type QrPayload = {
 
 const rand = (n: number) =>
   Array.from({ length: n }, () => "0123456789abcdef"[Math.floor(Math.random() * 16)]).join("");
+
+function secureToken(bytes = 16): string {
+  const value = new Uint8Array(bytes);
+  crypto.getRandomValues(value);
+  return Array.from(value, (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
 
 export const formatZar = (v: number) =>
   new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR" }).format(v);
@@ -145,9 +152,9 @@ type Store = {
   txns: Txn[];
   pendingCount: number;
   activeQr: QrPayload | null;
-  generateQr: (amount: number) => QrPayload;
+  generateQr: (amount: number) => Promise<QrPayload>;
   clearQr: () => void;
-  settleQr: (payload: QrPayload) => { ok: boolean; reason?: string; txn?: Txn };
+  settleQr: (payload: QrPayload) => Promise<{ ok: boolean; reason?: string; txn?: Txn }>;
   sellVas: (kind: "VAS_ELEC" | "VAS_AIRTIME", target: string, amount: number) => Txn;
   cashOut: (amount: number) => { ok: boolean; reason?: string };
   bankToWallet: (amount: number) => { ok: boolean; reason?: string };
@@ -163,6 +170,34 @@ type Store = {
 };
 
 const Ctx = createContext<Store | null>(null);
+
+const paymentGatewayUrl = import.meta.env.VITE_PAYMENT_GATEWAY_URL;
+
+async function gatewayRequest<T>(
+  path: string,
+  body?: unknown,
+  headers?: HeadersInit,
+  method: "GET" | "POST" = "POST",
+): Promise<T> {
+  const baseUrl = paymentGatewayUrl || (import.meta.env.DEV ? "http://127.0.0.1:8780" : window.location.origin);
+
+  let response: Response;
+  try {
+    response = await fetch(`${baseUrl}${path}`, {
+      method,
+      headers: { "content-type": "application/json", ...Object.fromEntries(new Headers(headers)) },
+      ...(method === "POST" ? { body: JSON.stringify(body) } : {}),
+    });
+  } catch {
+    throw new Error("Payment gateway is unreachable. Start the local mock bank or check the configured gateway.");
+  }
+
+  const result = (await response.json().catch(() => null)) as (T & { error?: string }) | null;
+  if (!response.ok || !result) {
+    throw new Error(result?.error ?? `Payment gateway request failed (${response.status})`);
+  }
+  return result;
+}
 
 export function PaymerchProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(() => loadFromStorage<Profile | null>("pm_profile"));
@@ -181,6 +216,9 @@ export function PaymerchProvider({ children }: { children: ReactNode }) {
   );
   const [online, setOnline] = useState(() => loadFromStorage<boolean>("pm_online") ?? true);
   const [activeQr, setActiveQr] = useState<QrPayload | null>(null);
+  const consumedQrTokens = useRef<Set<string>>(
+    new Set(loadFromStorage<string[]>("pm_consumed_qr_tokens") ?? []),
+  );
   const [txns, setTxns] = useState<Txn[]>(() =>
     loadFromStorage<Txn[]>("pm_txns") ?? [
       { id: rand(8), label: "Sale · Walk-in buyer", amount: 45, type: "MERCHANT_PAY", status: "SUCCESS", createdAt: Date.now() - 3.6e6 },
@@ -195,6 +233,31 @@ export function PaymerchProvider({ children }: { children: ReactNode }) {
   useEffect(() => { saveToStorage("pm_merchantBalance", merchantBalance); }, [merchantBalance]);
   useEffect(() => { saveToStorage("pm_online", online); }, [online]);
   useEffect(() => { saveToStorage("pm_txns", txns); }, [txns]);
+
+  useEffect(() => {
+    let active = true;
+    const refreshSharedBalances = async () => {
+      try {
+        const result = await gatewayRequest<{ buyerBalance: number; merchantBalance: number }>(
+          "/api/payments/balance",
+          undefined,
+          undefined,
+          "GET",
+        );
+        if (!active) return;
+        setBuyerBalance(result.buyerBalance);
+        setMerchantBalance(result.merchantBalance);
+      } catch {
+        // Local-only screens remain usable, but payment actions still fail at the gateway.
+      }
+    };
+    void refreshSharedBalances();
+    const timer = window.setInterval(() => void refreshSharedBalances(), 5000);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
+  }, []);
 
   const pinSet = pinVerifier !== null;
 
@@ -321,39 +384,77 @@ export function PaymerchProvider({ children }: { children: ReactNode }) {
 
   const push = useCallback((t: Txn) => setTxns((prev) => [t, ...prev]), []);
 
-  const generateQr = useCallback((amount: number) => {
-    const payload: QrPayload = {
-      ver: "1.0",
-      txn_token: `tok_${rand(8)}_pm`,
-      buyer_wallet: "wlt_buyer_4410",
-      amt: amount,
-      cur: "ZAR",
-      exp: Math.floor(Date.now() / 1000) + 60,
-      sig: rand(64),
-    };
+  const generateQr = useCallback(async (amount: number) => {
+    const amountCents = Math.round(amount * 100);
+    if (!Number.isSafeInteger(amountCents) || amountCents <= 0 || Math.abs(amount * 100 - amountCents) > 1e-7) {
+      throw new Error("Enter a valid amount in cents");
+    }
+    if (amountCents > Math.round(buyerBalance * 100)) throw new Error("Buyer has insufficient funds");
+    const result = await gatewayRequest<{ payload: QrPayload }>("/api/payments/qr", {
+      amount: amountCents / 100,
+      buyerWallet: "wlt_buyer_demo",
+    });
+    const payload = result.payload;
     setActiveQr(payload);
     return payload;
-  }, []);
+  }, [buyerBalance]);
 
   const settleQr = useCallback(
-    (payload: QrPayload) => {
-      if (Math.floor(Date.now() / 1000) > payload.exp) return { ok: false, reason: "Token expired (60s)" };
-      if (payload.amt > buyerBalance) return { ok: false, reason: "Buyer has insufficient funds" };
+    async (payload: QrPayload) => {
+      if (!online) return { ok: false, reason: "Reconnect before accepting a payment. Offline QR settlement is not supported." };
+      if (Math.floor(Date.now() / 1000) >= payload.exp) return { ok: false, reason: "Payment QR expired. Ask the buyer to generate a new one." };
+      const amountCents = Math.round(payload.amt * 100);
+      if (!Number.isSafeInteger(amountCents) || amountCents <= 0 || Math.abs(payload.amt * 100 - amountCents) > 1e-7) {
+        return { ok: false, reason: "Invalid payment amount" };
+      }
+      const idempotencyStorageKey = `pm_qr_idem_${payload.txn_token}`;
+      let idempotencyKey = loadFromStorage<string>(idempotencyStorageKey);
+      if (!idempotencyKey) {
+        idempotencyKey = secureToken(16);
+        saveToStorage(idempotencyStorageKey, idempotencyKey);
+      }
+      let settlement: {
+        status: "APPROVED" | "DECLINED";
+        transactionId: string;
+        amount: number;
+        currency: "ZAR";
+        actionCode: string;
+        message: string;
+        merchantBalance?: number;
+        buyerBalance?: number;
+      };
+      try {
+        settlement = await gatewayRequest("/api/payments/authorize", {
+          payload,
+          merchantWallet: "wlt_merchant_demo",
+        }, { "idempotency-key": idempotencyKey });
+      } catch (error) {
+        return { ok: false, reason: error instanceof Error ? error.message : "Gateway authorization failed" };
+      }
+      if (settlement.status !== "APPROVED") {
+        consumedQrTokens.current.add(payload.txn_token);
+        saveToStorage("pm_consumed_qr_tokens", [...consumedQrTokens.current].slice(-500));
+        if (activeQr?.txn_token === payload.txn_token) setActiveQr(null);
+        return { ok: false, reason: `${settlement.message} (response ${settlement.actionCode})` };
+      }
+
+      consumedQrTokens.current.add(payload.txn_token);
+      saveToStorage("pm_consumed_qr_tokens", [...consumedQrTokens.current].slice(-500));
       const txn: Txn = {
-        id: rand(8),
-        label: online ? "Sale · Dynamic QR" : "Sale · Offline pending sync",
-        amount: payload.amt,
+        id: settlement.transactionId,
+        label: "Mock bank approved · Dynamic QR",
+        amount: settlement.amount,
         type: "MERCHANT_PAY",
-        status: online ? "SUCCESS" : "PENDING",
+        status: "SUCCESS",
         createdAt: Date.now(),
       };
-      setBuyerBalance((b) => b - payload.amt);
-      if (online) setMerchantBalance((m) => m + payload.amt);
+      if (settlement.buyerBalance !== undefined) setBuyerBalance(settlement.buyerBalance);
+      if (settlement.merchantBalance !== undefined) setMerchantBalance(settlement.merchantBalance);
       push(txn);
-      setActiveQr(null);
+      if (activeQr?.txn_token === payload.txn_token) setActiveQr(null);
       return { ok: true, txn };
     },
-    [buyerBalance, online, push],
+    [activeQr, online, push],
   );
 
   const sellVas = useCallback(

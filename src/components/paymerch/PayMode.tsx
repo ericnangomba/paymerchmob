@@ -6,30 +6,28 @@ import { Keypad, MainButton, ScreenHeader } from "./ui";
 export function PayMode({ onBack, onHome }: { onBack: () => void; onHome?: () => void }) {
   const { buyerBalance, activeQr, generateQr, clearQr } = usePaymerch();
   const [raw, setRaw] = useState("");
-  const [left, setLeft] = useState(60);
+  const [left, setLeft] = useState(0);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const amount = Number(raw || "0") / 100;
 
   useEffect(() => {
     if (!activeQr) return;
-    setLeft(60);
+    const updateExpiry = () => setLeft(Math.max(0, activeQr.exp - Math.floor(Date.now() / 1000)));
+    updateExpiry();
     const id = setInterval(() => {
-      setLeft((v) => {
-        if (v <= 1) {
-          clearInterval(id);
-          return 0;
-        }
-        return v - 1;
-      });
+      updateExpiry();
     }, 1000);
     return () => clearInterval(id);
-  }, [activeQr]);
+  }, [activeQr?.exp]);
 
   return (
     <div className="flex h-full flex-col">
       <ScreenHeader title="Pay mode" onBack={onBack} />
       <div className="flex flex-1 flex-col justify-between px-5 py-5">
         <div className="text-center">
+          <p className="text-xs font-semibold uppercase text-warning">Mock bank · test funds only</p>
           <p className="text-xs uppercase tracking-wider text-muted-foreground">Amount to pay</p>
           <p className="mt-1 text-4xl font-bold tracking-tight text-foreground">
             {formatZar(amount)}
@@ -46,19 +44,30 @@ export function PayMode({ onBack, onHome }: { onBack: () => void; onHome?: () =>
         />
 
         <button
-          disabled={amount <= 0}
-          onClick={() => generateQr(amount)}
+          disabled={amount <= 0 || isGenerating}
+          onClick={async () => {
+            setIsGenerating(true);
+            setError(null);
+            try {
+              await generateQr(amount);
+            } catch (cause) {
+              setError(cause instanceof Error ? cause.message : "Could not create payment request");
+            } finally {
+              setIsGenerating(false);
+            }
+          }}
           className="rounded-2xl bg-primary py-4 text-base font-semibold text-primary-foreground disabled:opacity-40"
         >
-          Generate Payment QR
+          {isGenerating ? "Creating secure QR…" : "Generate Payment QR"}
         </button>
+        {error && <p className="text-center text-sm text-destructive" role="alert">{error}</p>}
       </div>
 
       {activeQr && (
         <div className="absolute inset-0 z-20 flex items-end bg-foreground/60 backdrop-blur-sm">
           <div className="w-full rounded-t-3xl bg-card p-6 text-center shadow-panel">
             <p className="text-sm font-semibold text-foreground">Show this to the merchant</p>
-            <p className="text-xs text-muted-foreground">Single-use token · {activeQr.txn_token}</p>
+            <p className="text-xs text-muted-foreground">Demo payment request · valid for 2 minutes</p>
             <div className="mx-auto mt-4 w-fit rounded-2xl border border-border bg-background p-3">
               <QRCodeSVG value={JSON.stringify(activeQr)} size={190} level="M" />
             </div>
@@ -68,6 +77,7 @@ export function PayMode({ onBack, onHome }: { onBack: () => void; onHome?: () =>
             >
               {left > 0 ? `Expires in ${left}s` : "Token expired"}
             </p>
+            <p className="mt-2 text-xs text-muted-foreground">Local mock approval only. No real money moves.</p>
             <button
               onClick={() => {
                 clearQr();
