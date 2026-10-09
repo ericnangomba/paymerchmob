@@ -15,9 +15,6 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
           className="splash-logo h-56 w-auto object-contain"
         />
       </div>
-      <p className="splash-mobile mt-2 text-xs font-bold uppercase tracking-[0.24em] text-muted-foreground">
-        Mobile
-      </p>
       <p className="splash-tagline mt-7 max-w-xs text-sm font-semibold leading-6 text-foreground">
         Simple payments for every informal trader
       </p>
